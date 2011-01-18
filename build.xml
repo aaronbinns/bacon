@@ -1,0 +1,63 @@
+<project name="bacon" default="all" basedir=".">
+
+  <property name="src.dir"   value="src" />
+  <property name="lib.dir"   value="lib"      />
+  <property name="build.dir" value="build"    />
+
+  <target name="all" depends="jar" />
+
+  <macrodef name="git-revision">
+    <attribute name="output" />
+    <sequential>
+      <exec executable="git" outputproperty="head">
+        <arg value="rev-parse" />
+        <arg value="HEAD" />
+      </exec>
+      <echo message="Git revision: ${head}"/>
+      <exec executable="git" outputproperty="dirty">
+        <arg value="diff" />
+        <arg value="--shortstat" />
+      </exec>
+      <condition property="@{output}" value="${head}" else="${head}-dirty">
+        <equals arg1="${dirty}" arg2="" />
+      </condition>
+    </sequential>
+  </macrodef>
+
+  <target name="compile">
+    <mkdir dir="${build.dir}/classes" />
+    <javac 
+           destdir="${build.dir}/classes"
+           debug="true"
+           verbose="false"
+           source="1.6"
+           target="1.6"
+           encoding="UTF-8"
+           fork="true"
+           deprecation="false">
+      <src path="${src.dir}/java" />
+      <include name="*.java" />
+      <classpath>
+        <fileset dir="${lib.dir}">
+          <include name="*.jar"/>
+        </fileset>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="jar" depends="compile">
+    <git-revision output="git.rev"></git-revision>
+    <echo message="${git.rev}" file="${build.dir}/version" />
+    <jar destfile="${build.dir}/bacon-${git.rev}.jar">
+      <fileset dir="${build.dir}/classes" />
+      <fileset dir="."
+               includes="${lib.dir}/*.jar"
+               excludes="${lib.dir}/hadoop-*-core.jar" />
+    </jar>
+  </target>
+
+  <target name="clean">
+    <delete dir="${build.dir}"/>
+  </target>
+
+</project>
