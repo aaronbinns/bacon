@@ -48,11 +48,16 @@
   <target name="jar" depends="compile">
     <git-revision output="git.rev"></git-revision>
     <echo message="${git.rev}" file="${build.dir}/version" />
+
+    <!-- Copy the class files from the nutchwax jar to this one --> 
+    <unzip src="${lib.dir}/nutchwax-0.13.jar" dest="${build.dir}/classes">
+      <patternset>
+        <include name="**/*.class"/>
+      </patternset>
+    </unzip>
+
     <jar destfile="${build.dir}/bacon-${git.rev}.jar">
       <fileset dir="${build.dir}/classes" />
-      <fileset dir="."
-               includes="${lib.dir}/*.jar"
-               excludes="${lib.dir}/hadoop-*-core.jar" />
     </jar>
   </target>
 
