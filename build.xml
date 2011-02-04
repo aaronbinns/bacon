@@ -58,6 +58,7 @@
 
     <jar destfile="${build.dir}/bacon-${git.rev}.jar">
       <fileset dir="${build.dir}/classes" />
+      <fileset file="${lib.dir}/effective_tld_names.dat" />
     </jar>
   </target>
 
