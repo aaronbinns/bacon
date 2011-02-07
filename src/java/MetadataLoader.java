@@ -33,13 +33,18 @@ import org.apache.nutch.metadata.Metadata;
 
 
 /**
- * Apache Pig UDF to load outlinks from a Nutch(WAX) segment.
+ * Apache Pig UDF to load metadata records from a Nutch(WAX) segment.
  *
  * This loader assumes that the path is to the 'parse_data'
  * sub-directory of a Nutch(WAX) segment.
  *
  * It returns a Tuple for each link, of the form:
- *   (from:chararray,to:chararray,anchor:chararray)
+ *   (url:chararray,
+ *    title:chararray,
+ *    length:long,
+ *    date:chararray,
+ *    type:chararray,
+ *    collection:chararray)
  */
 public class MetadataLoader extends LoadFunc
 {
@@ -57,13 +62,10 @@ public class MetadataLoader extends LoadFunc
   }
 
   /**
-   * This method is slightly complicated because each NutchWAX record
-   * contains all the outlinks for that page.  Thus 1 NW record can
-   * produce many Tuples.  So, this code advances to the next record,
-   * saves its place and emits Tuples for all the links; then advances
-   * to the next record.
-   *
-   * Any 'null' values are mapped to "" for simplicity.
+   * Reads a Nutch(WAX) metadata record and returns a Tuple containing
+   * the metadata values.  Any null String values are returned as "",
+   * but since 'length' is a Long, we return null if there is not a
+   * length value for a record.
    */
   public Tuple getNext( )
     throws IOException
@@ -90,11 +92,17 @@ public class MetadataLoader extends LoadFunc
             Metadata meta = pd.getContentMeta( );
 
             Tuple tuple = TupleFactory.getInstance( ).newTuple( );
-            tuple.append( get( meta, "url"        ) );
+
+            tuple.append( get( meta, "url" ) );
+
             tuple.append( title );
-            tuple.append( get( meta, "length"     ) );
-            tuple.append( get( meta, "date"       ) );
-            tuple.append( get( meta, "type"       ) );
+
+            try { tuple.append( new Long( get( meta, "length" ) ) ); } catch ( NumberFormatException nfe ) { tuple.append( null ); }
+
+            tuple.append( get( meta, "date" ) );
+
+            tuple.append( get( meta, "type" ) );
+
             tuple.append( get( meta, "collection" ) );
             
             return tuple;
