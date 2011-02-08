@@ -139,8 +139,15 @@ public class IDNHelper
    */
   public String getDomain( String host )
   {
-    host = IDN.toASCII( host );
-    
+    try
+      {
+        host = IDN.toASCII( host, IDN.ALLOW_UNASSIGNED );
+      }
+    catch ( Exception e )
+      {
+        host = null;
+      }
+
     if ( host == null ) return null;
 
     int i;
