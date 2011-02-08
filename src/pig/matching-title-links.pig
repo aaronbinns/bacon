@@ -25,8 +25,14 @@ meta  = LOAD 'segments/*/parse_data' USING MetadataLoader AS (url:chararray,titl
 links = LOAD 'segments/*/parse_data' USING OutlinkLoader AS (from:chararray,to:chararray,anchor:chararray);
 
 /* Eliminate empty titles and anchors */
-meta  = FILTER meta  BY title != '';
-links = FILTER links BY anchor != '';
+meta  = FILTER meta  BY title  != '';
+links = FILTER links BY from   != to AND anchor != '';
+
+/* Generate domains for the from and to urls */
+links = FOREACH links GENERATE from, DOMAIN( from ) as fromdomain, to, DOMAIN( to ) as todomain, anchor ;
+
+/* Eliminate intra-domain links */
+links = FILTER links BY fromdomain != todomain ;
 
 /* Join the links to the metadata records by URL */
 results = JOIN meta BY url, links BY to;
@@ -35,6 +41,15 @@ results = JOIN meta BY url, links BY to;
 results = FILTER results BY meta::title == links::anchor;
 
 /* Only keep the link info for the output */
-results = FOREACH results GENERATE links::from, links::to, links::anchor ;
+results = FOREACH results GENERATE links::fromdomain, links::todomain ; 
 
-DUMP results ;
+/* Group the links by from-to pairs */
+results = GROUP results BY (links::fromdomain, links::todomain);
+
+/* Count number of links in each from-to pair */
+results = FOREACH results GENERATE group, COUNT( $1 ) as count;
+
+/* Sort 'em */
+results = ORDER results BY count;
+
+DUMP results;
