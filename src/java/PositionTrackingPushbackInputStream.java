@@ -15,16 +15,16 @@
  */
 
 import java.io.*;
-import java.util.*;
-
 
 /**
- *
+ * Simple utility class which wraps a PushbackInputStream, keeping
+ * track of the byte position in the underlying stream.
  */
 public class PositionTrackingPushbackInputStream extends InputStream
 {
   private PushbackInputStream in;
   private long position;
+  private long mark;
 
   public PositionTrackingPushbackInputStream( PushbackInputStream in )
   {
@@ -50,6 +50,10 @@ public class PositionTrackingPushbackInputStream extends InputStream
 
   public void mark( int readlimit )
   {
+    if ( this.in.markSupported( ) )
+      {
+        this.mark = this.position;
+      }
     this.in.mark( readlimit );
   }
 
@@ -62,8 +66,12 @@ public class PositionTrackingPushbackInputStream extends InputStream
     throws IOException
   {
     this.in.reset( );
-  }
 
+    if ( this.in.markSupported( ) )
+      {
+        this.position = this.mark;
+      }
+  }
 
   public int read( )
     throws IOException
@@ -75,9 +83,6 @@ public class PositionTrackingPushbackInputStream extends InputStream
     return c;
   }
   
-  /**
-   * 
-   */
   public int read( byte[] b )
     throws IOException
   {
@@ -88,10 +93,6 @@ public class PositionTrackingPushbackInputStream extends InputStream
     return c;
   }
 
-  /**
-   * Will keep reading from multiple SingleGZIPInputStreams until the
-   * buffer is full or we reach EOF.
-   */
   public int read( byte[] b, int off, int len )
     throws IOException
   {
