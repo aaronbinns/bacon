@@ -33,18 +33,10 @@ import org.apache.nutch.metadata.Metadata;
 
 
 /**
- * Apache Pig UDF to load metadata records from a Nutch(WAX) segment.
+ * Apache Pig UDF to load CDX files using multi-gzip compression.
  *
- * This loader assumes that the path is to the 'parse_data'
- * sub-directory of a Nutch(WAX) segment.
- *
- * It returns a Tuple for each link, of the form:
- *   (url:chararray,
- *    title:chararray,
- *    length:long,
- *    date:chararray,
- *    type:chararray,
- *    collection:chararray)
+ * It returns a Tuple with as many fields as in the CDX line, which is
+ * usually 9.  The fields are untyped.
  */
 public class CompressedCDXLoader extends LoadFunc
 {
