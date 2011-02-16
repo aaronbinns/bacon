@@ -15,9 +15,10 @@
  */
 
 import java.io.*;
-import java.util.zip.*;
 
-
+/**
+ * Simple command-line test driver for MultipleGZIPInputStream.
+ */
 public class TestMultipleGZIPInputStream
 {
   public static void main( String[] args )
