@@ -1,3 +1,21 @@
+/*
+ * Copyright 2011 Internet Archive
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You
+ * may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+/**
+ * NOTICE: Derived from Hadoop TextInputFormat sources.
+ */
 
 import java.io.*;
 import java.util.*;
@@ -9,7 +27,14 @@ import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.util.LineReader;
 import org.apache.hadoop.conf.Configuration;
 
-
+/**
+ * TextInputFormat which reads from files compressed with catenated
+ * GZIP records.
+ *
+ * This class is written primarily to deal with the "compressed CDX"
+ * files produced and used by the Internet Archive tools, in
+ * particular the Wayback Machine.
+ */
 public class MultipleGZIPTextInputFormat extends TextInputFormat
 {
   public RecordReader<LongWritable,Text> createRecordReader(InputSplit split, TaskAttemptContext context) 
