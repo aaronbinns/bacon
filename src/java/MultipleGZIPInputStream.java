@@ -16,6 +16,7 @@
 
 import java.io.*;
 import java.util.*;
+import java.util.zip.*;
 
 /**
  * InputStream that can decompress multiple catenated gzip members as
@@ -252,4 +253,64 @@ public class MultipleGZIPInputStream extends InputStream
 
     return false;
   }
+
+  
+  /**
+   * Simple extension of Java GZIPInputStream that exposes the remaning
+   * bytes in the decompression buffer after decompression has
+   * completed.
+   *
+   * In getRemainingBytes() we use knowledge of the GZIPInputStream
+   * implementation -- so watch out.  The GZIPInputStream
+   * automatically reads the last 8 bytes of the GZip record, which is
+   * the record trailer.  So, if there are more than 8 bytes leftover
+   * in the compression buffer, we have to skip over those 8 bytes
+   * since the GZIPInputStream will take care of them.
+   */
+  public static class SingleGZIPInputStream extends GZIPInputStream
+  {
+    public static final byte[] EMPTY = { };
+    
+    public SingleGZIPInputStream( InputStream in )
+      throws IOException
+    {
+      super( in );
+    }
+    
+    public SingleGZIPInputStream( InputStream in, int size )
+      throws IOException
+    {
+      super( in, size );
+    }
+    
+    /**
+     * Return the bytes in the decompression buffer which are after the
+     * end of the GZIP record.  If we are at the end of the underlying
+     * input stream, then we return an empty byte[].
+     */
+    public byte[] getRemainingBytes( )
+    {
+      int n = inf.getRemaining();
+      
+      // If there are more than 8 bytes remaining in the decompression
+      // buffer, then those first 8 are the GZip record tailer which we
+      // just skip over.
+      if ( n > 8 )
+        {
+          return Arrays.copyOfRange( buf, len - n + 8, len );
+        }
+      
+      // Otherwise, there are 8 or fewer bytes, then we just ignore them
+      // and return and empty byte array.
+      return EMPTY;
+    }
+    
+    public int getRemaining( )
+    {
+      int n = inf.getRemaining( );
+      
+      return n;
+    }
+  }
+
 }
