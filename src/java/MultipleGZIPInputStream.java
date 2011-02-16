@@ -1,7 +1,21 @@
+/*
+ * Copyright 2011 Internet Archive
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You
+ * may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 import java.io.*;
 import java.util.*;
-
 
 /**
  * InputStream that can decompress multiple catenated gzip members as
@@ -97,8 +111,6 @@ public class MultipleGZIPInputStream extends InputStream
           {
             if ( eof( ) ) return totalRead == 0 ? -1 : totalRead;
            
-            // System.err.println( "Start new GZIP record at: " + this.in.getPosition() );
- 
             this.gis = new SingleGZIPInputStream( this.in, this.bufsize );
           }
 
@@ -109,8 +121,6 @@ public class MultipleGZIPInputStream extends InputStream
           }
         catch ( IOException e )
           {
-            // System.err.println( "Error position: " + this.in.getPosition( ) + " remaining bytes: " + this.gis.getRemaining( ) + " totalRead: " + totalRead );
-
             if ( totalRead == 0 ) 
               {
                 throw e;
@@ -121,8 +131,6 @@ public class MultipleGZIPInputStream extends InputStream
         
         if ( c < 0 )
           {
-            // System.err.println( "End compressed data at: " + (this.in.getPosition() - this.gis.getRemaining()) + " (" + this.in.getPosition( ) + " - " + this.gis.getRemaining( ) + ")" );
- 
             this.in.unread( this.gis.getRemainingBytes( ) );
             
             this.gis = null;
