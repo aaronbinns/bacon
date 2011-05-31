@@ -56,6 +56,12 @@
       </patternset>
     </unzip>
 
+    <unzip src="${lib.dir}/wayback-core-1.6.0.jar" dest="${build.dir}/classes">
+      <patternset>
+        <include name="**/*.class"/>
+      </patternset>
+    </unzip>
+
     <jar destfile="${build.dir}/bacon-${git.rev}.jar">
       <fileset file="${build.dir}/version" />
       <fileset dir="${build.dir}/classes" />
