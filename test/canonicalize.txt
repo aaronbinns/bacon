@@ -1,0 +1,16 @@
+http://example.com/
+http://example.com//A
+http://example.com/A
+http://example.com/A/
+http://example.com/A?
+http://example.com/A?&
+http://example.com/A?q=foo&
+http://example.com/A?q=foo&&
+http://example.com/a
+http://www.example.com
+http://www.example.com/
+http://www.example.com/A
+http://www.example.com/A
+http://www.example.com/A?jsessionid=999A9EF028317A82AC83F0FDFE59385A
+http://www.example.com/A?q=foo
+http://www.example.com/B/../A
