@@ -18,7 +18,8 @@
  * Emit the canonicalized URL for each URL.
  */
 
-REGISTER bacon.jar ; 
+REGISTER bacon.jar; 
+REGISTER lib/wayback-core-1.6.0.jar;
 
 DEFINE CANONICALIZE org.archive.bacon.Canonicalize();
 
