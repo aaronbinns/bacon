@@ -13,7 +13,7 @@
  * implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package org.archive.bacon;
+package org.archive.bacon.url;
 
 import java.io.*;
 import java.net.*;
