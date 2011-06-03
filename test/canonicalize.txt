@@ -6,7 +6,10 @@ http://example.com/A?
 http://example.com/A?&
 http://example.com/A?q=foo&
 http://example.com/A?q=foo&&
+http://example.com/A?q=foo&&t=bar
+http://example.com/B/.././a?q=foo&t=bar
 http://example.com/a
+http://example.com/a#b
 http://www.example.com
 http://www.example.com/
 http://www.example.com/A
@@ -14,3 +17,20 @@ http://www.example.com/A
 http://www.example.com/A?jsessionid=999A9EF028317A82AC83F0FDFE59385A
 http://www.example.com/A?q=foo
 http://www.example.com/B/../A
+http://www.foo.فلسطين
+http://www.foo.فلسطين/
+http://www.foo.فلسطين/index.html
+http://foo.فلسطين
+http://foo.فلسطين/
+http://foo.فلسطين/index.html
+http://www.foo.xn--ygbi2ammx
+http://www.foo.xn--ygbi2ammx/
+http://www.foo.xn--ygbi2ammx/index.html
+http://foo.xn--ygbi2ammx
+http://foo.xn--ygbi2ammx/
+http://foo.xn--ygbi2ammx/index.html
+http://example.org/some%20thing.html
+http://example.org/some thing.html
+http://www.example.org/A/../SOME%20thing.html?jsessionid=999A9EF028317A82AC83F0FDFE59385A
+http://www.example.org/some thing.html
+http://example.org/some thing/else/../../some%20thing.html

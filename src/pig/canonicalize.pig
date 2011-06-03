@@ -20,8 +20,9 @@
 
 REGISTER bacon.jar ; 
 
+DEFINE CANONICALIZE org.archive.bacon.Canonicalize();
+
 /* Load the link graph in the form the same as the example table above. */
--- cdx = LOAD '/home/aaron/iipc/2011-hague/workshop/data/cdx/*.cdx' USING PigStorage(' ') AS (url:chararray, date:chararray, fullurl:chararray, type:chararray, code:chararray, hash:chararray, x:chararray, offset:chararray, arcname:chararray);
 cdx = LOAD 'test/canonicalize.txt' AS (fullurl:chararray);
 
 /* Canonicalize the full URLs */
