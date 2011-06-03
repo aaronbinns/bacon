@@ -13,6 +13,7 @@
  * implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
+package org.archive.bacon;
 
 import java.io.*;
 import java.net.*;
@@ -21,20 +22,27 @@ import org.apache.pig.EvalFunc;
 import org.apache.pig.data.Tuple;
 import org.apache.pig.impl.util.WrappedIOException;
 
-import org.archive.wayback.util.url.AggressiveUrlCanonicalizer;
-
 /**
  * Simple Pig EvalFunc which takes a chararray assumed to be a URL and
  * returns the domain, as determined by the IDNHelper.
  */ 
-public class CANONICALIZE extends EvalFunc<String>
+public class Domain extends EvalFunc<String>
 {
-  AggressiveUrlCanonicalizer canonicalizer;
+  IDNHelper helper;
 
-  public CANONICALIZE( )
+  public Domain( )
     throws IOException
   {
-    this.canonicalizer = new AggressiveUrlCanonicalizer();
+    InputStream is = IDNHelper.class.getClassLoader( ).getResourceAsStream( "effective_tld_names.dat" );
+
+    if ( is == null )
+      {
+        throw new RuntimeException( "Cannot load tld rules: effective_tld_names.dat" );
+      }
+
+    Reader r = new InputStreamReader( is, "utf-8" );
+    
+    this.helper = IDNHelper.build( r );
   }
 
 
@@ -45,14 +53,22 @@ public class CANONICALIZE extends EvalFunc<String>
 
     try
       {
-        String c = this.canonicalizer.canonicalize( (String) input.get(0) );
+        URL u = new URL( (String) input.get(0) );
 
-        if ( c.length() > 10 && c.startsWith("http://www.") || c.startsWith("https://www.") )
-          {
-            c = "http://" + c.substring(11);
-          }
+        String domain = this.helper.getDomain( u );
+        
+        // If domain cannot be determined, return empty string.
+        if ( domain == null ) domain = "";
 
-        return c;
+        // Ensure i18n domains are in Unicode format.
+        domain = java.net.IDN.toUnicode( domain, java.net.IDN.ALLOW_UNASSIGNED );
+
+        return domain;
+      }
+    catch ( MalformedURLException mue )
+      {
+        // If not a valid URL, just return an empty string.
+        return "";
       }
     catch ( Exception e )
       {

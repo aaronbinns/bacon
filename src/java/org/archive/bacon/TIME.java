@@ -13,58 +13,63 @@
  * implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
+package org.archive.bacon;
 
 import java.io.*;
 import java.net.*;
+import java.text.*;
+import java.util.*;
 
 import org.apache.pig.EvalFunc;
 import org.apache.pig.data.Tuple;
 import org.apache.pig.impl.util.WrappedIOException;
 
 /**
- * Simple Pig EvalFunc which takes a chararray assumed to be a URL and
- * returns the domain, as determined by the IDNHelper.
+ * Simple Pig EvalFunc which takes a chararray assumed to be a "date"
+ * in WARC or ARC format and convert it to "number of seconds since
+ * the epoch" format, returning a long value.
  */ 
-public class DOMAIN extends EvalFunc<String>
+public class TIME extends EvalFunc<Long>
 {
-  IDNHelper helper;
-
-  public DOMAIN( )
+  
+  public TIME( )
     throws IOException
   {
-    InputStream is = IDNHelper.class.getClassLoader( ).getResourceAsStream( "effective_tld_names.dat" );
-
-    if ( is == null )
-      {
-        throw new RuntimeException( "Cannot load tld rules: effective_tld_names.dat" );
-      }
-
-    Reader r = new InputStreamReader( is, "utf-8" );
     
-    this.helper = IDNHelper.build( r );
   }
 
-
-  public String exec( Tuple input )
+  public Long exec( Tuple input )
     throws IOException 
   {
     if ( input == null || input.size() == 0 ) return null;
 
     try
       {
-        URL u = new URL( (String) input.get(0) );
+        String s = (String) input.get(0);
 
-        String domain = this.helper.getDomain( u );
+        String format = null;
+        switch ( s.length() )
+          {
+          default:
+            // Unknown format
+            return null;
+
+          case 20:
+            // WARC format: "2011-05-05T18:55:26Z"
+            format = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+            break;
+
+          case 14:
+            // ARC format : "20110505185526"
+            format = "yyyyMMddHHmmss";
+            break;
+          }
+
+        SimpleDateFormat sdf = new SimpleDateFormat( format );
+
+        Date d = sdf.parse( s );
         
-        // If domain cannot be determined, return empty string.
-        if ( domain == null ) domain = "";
-
-        return domain;
-      }
-    catch ( MalformedURLException mue )
-      {
-        // If nto a valid URL, just return an empty string.
-        return "";
+        return d.getTime();
       }
     catch ( Exception e )
       {
