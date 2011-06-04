@@ -1,0 +1,6 @@
+abc	ABCNews.com: Breaking News, Politics, World News, Good Morning America, Exclusive Interviews 
+cbs	CBS News brings you the latest breaking world news, national news, political, business and entertainment news, as well as stories from 60 Minutes and the Early Show.
+nbc	Msnbc.com is a leader in breaking news, video and original journalism. Stay current with daily news updates in health, entertainment, business, science, technology and sports videos
+fox	Breaking News, Latest News and Current News from FOXNews.com. Breaking news and video. Latest Current News: U.S., World, Entertainment, Health, Business, Technology, Politics, Sports.
+cnn	CNN.com delivers the latest breaking news and information on the latest top stories, weather, business, entertainment, politics, and more. For in-depth coverage, CNN.com provides special reports, video, audio, photo galleries, and interactive guides.
+bbc	Breaking news, sport, TV, radio and a whole lot more. The BBC informs, educates and entertains - wherever you are, whatever your age.
