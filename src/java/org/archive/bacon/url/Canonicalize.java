@@ -50,6 +50,9 @@ public class Canonicalize extends EvalFunc<String>
       {
         String c = this.canonicalizer.canonicalize( (String) input.get(0) );
 
+        // In some rare cases the Wayback canonicalizer can return null.
+        if ( c == null ) return null;
+
         // See JIRA ACC-109
         if ( c.length() > 10 )
           {
