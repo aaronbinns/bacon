@@ -1,3 +1,13 @@
+--
+-- Compute the Jaccard similarity among every combination of strings.
+--
+-- The input is of the form '<key> <value>' where each one is a string.
+-- The output is the combination of every pair of keys, along with the
+-- Jaccard similarity of their values.
+--
+-- The sample input file is an excerpt of 'description' meta-tags from
+-- popular news websites.
+--
 %default GRAPH 'test/jaccard.txt';
 
 REGISTER bacon.jar;
@@ -32,18 +42,6 @@ edges2 = FOREACH edges2 GENERATE v1, FLATTEN(v2) as v2, v1_out;
 --   The Data Chef: Structural Similarity With Apache Pig
 --   http://thedatachef.blogspot.com/2011/05/structural-similarity-with-apache-pig.html
 -- With a few modifications of my own.
-
-/* We don't need this part since we compute the aug_edges and aug_dups above.
---
--- Augment the edges with the sizes of their outgoing adjacency lists. Note that
--- if a self join was possible we would only have to do this once.
---
-grouped_edges = GROUP edges BY v1;
-aug_edges     = FOREACH grouped_edges GENERATE FLATTEN(edges) AS (v1, v2), COUNT(edges) AS v1_out;
- 
-grouped_dups  = GROUP edges_dup BY v1;
-aug_dups      = FOREACH grouped_dups GENERATE FLATTEN(edges_dup) AS (v1, v2), COUNT(edges_dup) AS v1_out;
-*/
 
 --
 -- Compute the sizes of the intersections of outgoing adjacency lists
