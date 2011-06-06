@@ -128,11 +128,7 @@ public class Canonicalize extends EvalFunc<String>
 
             c = u.toString();
           }
-        catch ( MalformedURLException mue )
-          {
-            // Do nothing, leave the canonicalized URI as it is.
-          }
-        catch ( URISyntaxException use )
+        catch ( Exception e )
           {
             // Do nothing, leave the canonicalized URI as it is.
           }
