@@ -41,6 +41,7 @@ import org.apache.nutch.metadata.Metadata;
  *
  * It returns a Tuple for each link, of the form:
  *   (url:chararray,
+ *    digest:chararray,
  *    title:chararray,
  *    length:long,
  *    date:chararray,
@@ -95,6 +96,8 @@ public class MetadataLoader extends LoadFunc
             Tuple tuple = TupleFactory.getInstance( ).newTuple( );
 
             tuple.append( get( meta, "url" ) );
+
+            tuple.append( get( meta, "digest" ) );
 
             tuple.append( title );
 
