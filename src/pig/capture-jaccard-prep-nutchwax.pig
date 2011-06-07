@@ -32,7 +32,7 @@ pages = FOREACH pages
 --   token  :chararray
 --   num_tokens:long
 --
--- This is the input format for nutchwax-capture-jaccard-2.pig
+-- This is the input format for capture-jaccard.pig
 -- 
 rmf $OUTPUT;
 STORE pages INTO '$OUTPUT';
