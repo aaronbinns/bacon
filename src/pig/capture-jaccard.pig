@@ -1,7 +1,9 @@
 --
--- Read the output from nutchwax-capture-jaccard-1.pig script and
--- calculate the Jaccard similarity of all the combinations of
--- captures for each URL.
+-- Calculate the Jaccard similarity of all the combinations of
+-- captures for each URL.  Input data must be in the specified format.
+--
+-- See the 'capture-jaccard-prep-*.pig' scripts which produce that
+-- format from various sources.
 --
 %default INPUT=''
 %default OUTPUT=''
