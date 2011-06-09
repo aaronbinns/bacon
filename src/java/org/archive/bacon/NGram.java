@@ -50,30 +50,62 @@ public class NGram extends EvalFunc<DataBag>
   BagFactory   mBagFactory = BagFactory.getInstance();
   
   @Override
-  public DataBag exec(Tuple input) throws IOException
+  public DataBag exec( Tuple input ) throws IOException
   {
     try
       {
         if ( input == null || input.size() < 1 ) return null;
         
-        String source = (String) input.get(0);
-        String delim  = (input.size() > 1 ) ? (String)  input.get(1) : "\\s";
-        int    n      = (input.size() > 2 ) ? (Integer) input.get(2) : 1;
-        
-        if ( source == null || delim == null ) return null;
+        DataBag         tokens = (DataBag) input.get(0);
+        Iterator<Tuple> titer  = tokens.iterator();
 
-        if ( n < 1 ) return null;
+        int n      = (input.size() > 1 ) ? (Integer) input.get(1) : 1;
+        int offset = (input.size() > 2 ) ? (Integer) input.get(2) : 1;
+
+        if ( n < 1 || offset < 1 ) return null;
         
+        LinkedList<Tuple> window = new LinkedList<Tuple>();
+        for ( int i = 0 ; i < offset ; i++ ) window.add( null );  // Fill with sentinels
+
         DataBag output = mBagFactory.newDefaultBag();
-        
-        String[] tokens = source.split(delim);
 
-        for ( int i = 0; i <= tokens.length - n ; i++ )
+        // In the following loop, we have to explicitly check for the
+        // end of the input tokens.  The iterator returned by
+        // DataBag.iterator() will happily return 'null' rather than
+        // throw a NoSuchElementException when it hits the end of the
+        // list.  In, violation of the Iterator.next() spec AFAICT.
+      loop: 
+        while ( true )
           {
-            Tuple ngram = mTupleFactory.newTuple( n );
-            for ( int j = 0 ; j < n ; j++ )
+            // Gobble up the front of the window, up to the 'offset'.
+            int wsize = Math.min( window.size(), offset );
+            for ( int j = wsize ; j > 0 ; j-- )
               {
-                ngram.set( j, tokens[i+j] );
+                window.poll();
+              }
+
+            // If the offset is bigger than the ngram size, keep
+            // eating tokens.
+            for ( int j = 0 ; j < offset - wsize ; j++ )
+              {
+                if ( ! titer.hasNext( ) ) break loop;
+                titer.next();
+              }
+
+            // Fill any remaining slots in the window to get N tokens
+            while ( window.size() < n )
+              {
+                if ( ! titer.hasNext() ) break loop;
+                
+                window.add( titer.next() );
+              }
+            
+            // Copy the tokens from the window to a new NGram, then
+            // add that NGram to the output.
+            Tuple ngram = mTupleFactory.newTuple( n );
+            for ( int j = 0; j < n ; j++ )
+              {
+                ngram.set( j, window.get(j) );
               }
             
             output.add( ngram );
