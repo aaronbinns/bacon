@@ -132,6 +132,14 @@ public class Canonicalize extends EvalFunc<String>
           {
             // Do nothing, leave the canonicalized URI as it is.
           }
+
+        if ( c == null ) return null;
+
+        // Last, but not least, ensure no whitespace in the URL
+        // Change ' ' to %20 but remove all other whitespace.
+        c = c.trim();
+        c = c.replaceAll( "[ ]", "%20" );
+        c = c.replaceAll( "\\s", "" );
         
         return c;
       }
