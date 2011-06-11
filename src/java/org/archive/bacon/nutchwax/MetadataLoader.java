@@ -161,19 +161,12 @@ public class MetadataLoader extends LoadFunc
   public void setLocation( String location, Job job )
     throws IOException
   {
-    // Can we do this?
-    //   
-    // MultipleInputs.addInputPath( conf, new Path( p, "parse_data" ), SequenceFileInputFormat.class, Map.class );
-    // MultipleInputs.addInputPath( conf, new Path( p, "parse_text" ), SequenceFileInputFormat.class, Map.class );
-
-    // For now, let's assume the user gave the full path to the parse_data subdir.
-
     // Expand any filename globs, and add each to the input paths.
     FileStatus[] files = FileSystem.get( job.getConfiguration( ) ).globStatus( new Path( location ) );
 
     for ( FileStatus file : files )
       {
-        FileInputFormat.addInputPath( job, file.getPath( ) );
+        FileInputFormat.addInputPath( job, new Path( file.getPath( ), "parse_data" ) );
       }
   }
 

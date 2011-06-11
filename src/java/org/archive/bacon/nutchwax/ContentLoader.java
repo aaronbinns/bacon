@@ -131,14 +131,12 @@ public class ContentLoader extends LoadFunc
   public void setLocation( String location, Job job )
     throws IOException
   {
-    // For now, let's assume the user gave the full path to the parse_text subdir.
-
     // Expand any filename globs, and add each to the input paths.
     FileStatus[] files = FileSystem.get( job.getConfiguration( ) ).globStatus( new Path( location ) );
 
     for ( FileStatus file : files )
       {
-        FileInputFormat.addInputPath( job, file.getPath( ) );
+        FileInputFormat.addInputPath( job, new Path( file.getPath( ), "parse_text" ) );
       }
   }
 
