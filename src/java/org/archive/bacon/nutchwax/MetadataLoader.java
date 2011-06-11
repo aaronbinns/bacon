@@ -46,12 +46,17 @@ import org.apache.nutch.metadata.Metadata;
  *    length:long,
  *    date:chararray,
  *    type:chararray,
- *    collection:chararray)
+ *    collection:chararray,
+ *    boiled:chararray,
+ *    links: { tuple(toUrl:chararray, anchor:chararray) }
+ * )
  */
 public class MetadataLoader extends LoadFunc
 {
   private RecordReader<Text,Writable> reader;
-  
+
+  private TupleFactory mTupleFactory = TupleFactory.getInstance();
+  private BagFactory   mBagFactory   = BagFactory.getInstance();
   
   /**
    * The Nutch(WAX) "parse_data" segment is just a SequenceFile
@@ -88,27 +93,31 @@ public class MetadataLoader extends LoadFunc
                     
             ParseData pd = (ParseData) value;
 
-            String title = pd.getTitle( ); 
-            title = title == null ? "" : title;
-            
             Metadata meta = pd.getContentMeta( );
 
-            Tuple tuple = TupleFactory.getInstance( ).newTuple( );
+            Tuple tuple = mTupleFactory.newTuple( );
 
-            tuple.append( get( meta, "url" ) );
-
-            tuple.append( get( meta, "digest" ) );
-
-            tuple.append( title );
-
-            try { tuple.append( new Long( get( meta, "length" ) ) ); } catch ( NumberFormatException nfe ) { tuple.append( null ); }
-
-            tuple.append( get( meta, "date" ) );
-
-            tuple.append( get( meta, "type" ) );
-
-            tuple.append( get( meta, "collection" ) );
+            tuple.append( meta.get( "url"    ) );
+            tuple.append( meta.get( "digest" ) );
+            tuple.append( pd.getTitle( ) );
+            try { tuple.append( new Long( meta.get( "length" ) ) ); } catch ( NumberFormatException nfe ) { tuple.append( null ); }
+            tuple.append( meta.get( "date"       ) );
+            tuple.append( meta.get( "type"       ) );
+            tuple.append( meta.get( "collection" ) );
+            tuple.append( meta.get( "boiled"     ) );
             
+            DataBag links = mBagFactory.newDefaultBag();
+            for ( Outlink link : pd.getOutlinks() )
+              {
+                Tuple lt = mTupleFactory.newTuple( 2 );
+                lt.set( 0, link.getToUrl ( ) );
+                lt.set( 1, link.getAnchor( ) );
+
+                links.add( lt );
+              }
+
+            tuple.append( links );
+
             return tuple;
           }
 

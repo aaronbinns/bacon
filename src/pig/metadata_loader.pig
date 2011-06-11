@@ -10,7 +10,7 @@ REGISTER bacon.jar
 REGISTER lib/nutchwax-0.13.jar
 
 pages = LOAD '$INPUT' 
-        USING org.archive.bacon.nutchwax.MetadataLoader() 
+        USING org.archive.bacon.nutchwax.MetadataLoader( )
         AS 
           (url:chararray,
            digest:chararray,
@@ -18,6 +18,8 @@ pages = LOAD '$INPUT'
            length:long,
            date:chararray,
            type:chararray,
-           collection:chararray);
+           collection:chararray,
+           boiled:chararray,
+           links:{ link:tuple(url:chararray,anchor:chararray) } );
 
 dump pages;
