@@ -17,8 +17,8 @@ pages2 = LOAD '$INPUT' AS (url:chararray,
                            token:chararray,
                            num_tokens:long );
 
-edges1 = FOREACH pages1 GENERATE TOTUPLE(url,digest) as v1, TOTUPLE(url,token) as v2, num_tokens as v1_out;
-edges2 = FOREACH pages2 GENERATE TOTUPLE(url,digest) as v1, TOTUPLE(url,token) as v2, num_tokens as v1_out;
+edges1 = FOREACH pages1 GENERATE TOTUPLE(url,digest) as v1, token as v2, num_tokens as v1_out;
+edges2 = FOREACH pages2 GENERATE TOTUPLE(url,digest) as v1, token as v2, num_tokens as v1_out;
 
 -- The rest is taken from:
 --   The Data Chef: Structural Similarity With Apache Pig
