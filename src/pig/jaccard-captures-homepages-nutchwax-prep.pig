@@ -1,7 +1,11 @@
 --
 -- Read from a NutchWAX segment and output in the form to be used for
--- a Jaccard similarity comparison across multiple captures fo the
--- same URL.
+-- a Jaccard similarity comparison.
+--
+-- *Also*, apply a filter so that only 'homepages' are emitted.  When
+-- the output of this script is fed into with
+-- 'jaccard-captures-all.pig', we get the similarity scores of all
+-- combinations of homepages.
 --
 %default INPUT=''
 %default OUTPUT=''

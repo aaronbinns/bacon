@@ -1,8 +1,17 @@
 --
+
 -- Calculate the Jaccard similarity of all the combinations of
--- captures for each URL.  Input data must be in the specified format.
+-- captures for each URL, *not* across all URLs.  Input data must be
+-- in the specified format.
 --
--- See the 'capture-jaccard-prep-*.pig' scripts which produce that
+-- The subtle difference between this script and
+-- jaccard-captures-all.pig is the use of TOTUPLE(url,token) when
+-- generating the pages.  This binds the URL to the token so that only
+-- captures of the same URL will be joined together.
+--
+-- Otherwise the scripts are the same.
+--
+-- See the 'jaccard-captures-*-prep.pig' scripts which produce that
 -- format from various sources.
 --
 %default INPUT=''

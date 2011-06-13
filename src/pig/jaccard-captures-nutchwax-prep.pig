@@ -1,7 +1,6 @@
 --
 -- Read from a NutchWAX segment and output in the form to be used for
--- a Jaccard similarity comparison across multiple captures fo the
--- same URL.
+-- a Jaccard similarity comparison.
 --
 %default INPUT=''
 %default OUTPUT=''

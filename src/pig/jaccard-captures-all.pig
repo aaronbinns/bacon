@@ -1,8 +1,9 @@
 --
 -- Calculate the Jaccard similarity of all the combinations of
--- captures for each URL.  Input data must be in the specified format.
+-- captures across *all* URLs.  Input data must be in the specified
+-- format.
 --
--- See the 'capture-jaccard-prep-*.pig' scripts which produce that
+-- See the 'jaccard-captures-*-prep.pig' scripts which produce that
 -- format from various sources.
 --
 %default INPUT=''
