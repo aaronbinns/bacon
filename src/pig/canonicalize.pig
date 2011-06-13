@@ -21,13 +21,13 @@
 REGISTER bacon.jar; 
 REGISTER lib/wayback-core-1.6.0.jar;
 
-DEFINE CANONICALIZE org.archive.bacon.Canonicalize();
+DEFINE canonicalize org.archive.bacon.url.Canonicalize();
 
 /* Load the link graph in the form the same as the example table above. */
 cdx = LOAD 'test/canonicalize.txt' AS (fullurl:chararray);
 
 /* Canonicalize the full URLs */
-curls = FOREACH cdx GENERATE CANONICALIZE( fullurl ) as curl, fullurl;
+curls = FOREACH cdx GENERATE canonicalize( fullurl ) as curl, fullurl;
 
 /* Get use the unique curl,fullurl pairs */
 curls = DISTINCT curls;
