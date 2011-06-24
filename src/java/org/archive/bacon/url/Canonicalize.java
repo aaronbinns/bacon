@@ -123,8 +123,19 @@ public class Canonicalize extends EvalFunc<String>
                 ref = "";
               }
 
-            // Lastly, rebuild the URL path + query + ref using the modified values.
+            // Now, rebuild the URL path + query + ref using the modified values.
             u = new URL( u, path + query + ref );
+
+            // If the protocol is http and the port is explicitly set
+            // as "80", strip out the explicit port.
+            if ( ("http" .equals(u.getProtocol()) && 80  == u.getPort()) ||
+                 ("https".equals(u.getProtocol()) && 443 == u.getPort()) )
+              {
+                u = new URL( u.getProtocol(), 
+                             u.getHost(),
+                             -1,
+                             u.getFile() );
+              }
 
             c = u.toString();
           }
