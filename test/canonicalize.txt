@@ -29,8 +29,12 @@ http://www.foo.xn--ygbi2ammx/index.html
 http://foo.xn--ygbi2ammx
 http://foo.xn--ygbi2ammx/
 http://foo.xn--ygbi2ammx/index.html
-http://example.org/some%20thing.html
-http://example.org/some thing.html
-http://www.example.org/A/../SOME%20thing.html?jsessionid=999A9EF028317A82AC83F0FDFE59385A
-http://www.example.org/some thing.html
-http://example.org/some thing/else/../../some%20thing.html
+http://example.com/some%20thing.html
+http://example.com/some thing.html
+http://www.example.com/A/../SOME%20thing.html?jsessionid=999A9EF028317A82AC83F0FDFE59385A
+http://www.example.com/some thing.html
+http://example.com/some thing/else/../../some%20thing.html
+http://example.com:80/
+http://example.com:80/index.html
+https://example.com:443/
+https://example.com/
