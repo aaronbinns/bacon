@@ -26,10 +26,10 @@ public class FPGenerator extends EvalFunc<String>
     try
       {
         String s = (String) input.get(0);
-        
-        s = Long.toHexString( FPGeneratorImpl.std64.fp( s ) );
 
-        return s;
+        String f = Long.toHexString( FPGeneratorImpl.std64.fp( s ) );
+
+        return f;
       }
     catch ( Exception e )
       {
