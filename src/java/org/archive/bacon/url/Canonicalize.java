@@ -95,7 +95,14 @@ public class Canonicalize extends EvalFunc<String>
             path = path.replaceAll( "[+]", "%2b" );  // Don't decode '+' into ' '.
             path = URLDecoder.decode( path, "utf-8" );
             URI uriPath = new URI( null, null, path, null );
-            uriPath = uriPath.normalize();
+            try
+              {
+                uriPath = uriPath.normalize();
+              }
+            catch ( InternalError ie )
+              {
+                System.err.println( "A-ha, triggers URI's InternalError: " + path );
+              }
             path = uriPath.getRawPath();
             
             // Hacks for the query
@@ -139,7 +146,7 @@ public class Canonicalize extends EvalFunc<String>
 
             c = u.toString();
           }
-        catch ( Exception e )
+        catch ( Throwable t )
           {
             // Do nothing, leave the canonicalized URI as it is.
           }
