@@ -67,9 +67,9 @@ import org.apache.pig.FuncSpec;
  *
  * returns:
  *
- *  {("From my own observation, biànyi is seldom used in Chinese daily conversations. When we speak ),
- *   (便宜, ),
- *   (we just mean "cheap.")}
+ *  {('"From my own observation, biànyi is seldom used in Chinese daily conversations. When we speak ',LATIN),
+ *   ('便宜, ',CJK),
+ *   ('we just mean "cheap."',LATIN)}
  *
  * NOTE on Unicode scripts and Java: 
  *
@@ -80,7 +80,7 @@ import org.apache.pig.FuncSpec;
  * "what script is this codepoint" API, so we kludge something using
  * Unicode blocks and grouping them together according to our own
  * decision about what goes together.  See the getScript() method for
- * details.
+ * specifics.
  */
 public class ScriptTagger extends EvalFunc<DataBag> 
 {
