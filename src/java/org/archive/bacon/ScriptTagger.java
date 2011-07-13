@@ -217,21 +217,22 @@ public class ScriptTagger extends EvalFunc<DataBag>
   }
   
   /*
-   * The schema isn't known until the UDF is called.  At point, all we
-   * know is that we have a bag of tuples, but we don't know the #
-   * elements in the tuples.
    *
+   */
   @SuppressWarnings("deprecation")
   @Override
   public Schema outputSchema(Schema input)
   {
     try
       {
-        Schema.FieldSchema tokenFs = new Schema.FieldSchema("token", DataType.CHARARRAY); 
-        Schema tupleSchema = new Schema(tokenFs);
+        Schema.FieldSchema tokenFs  = new Schema.FieldSchema("token",  DataType.CHARARRAY);
+        Schema.FieldSchema scriptFs = new Schema.FieldSchema("script", DataType.CHARARRAY);
+        Schema tupleSchema = new Schema();
+        tupleSchema.add(tokenFs);
+        tupleSchema.add(scriptFs);
         
         Schema.FieldSchema tupleFs;
-        tupleFs = new Schema.FieldSchema("tuple_of_tokens", tupleSchema, DataType.TUPLE);
+        tupleFs = new Schema.FieldSchema("token_script", tupleSchema, DataType.TUPLE);
         
         Schema bagSchema = new Schema(tupleFs);
         bagSchema.setTwoLevelAccessRequired(true);
@@ -247,7 +248,6 @@ public class ScriptTagger extends EvalFunc<DataBag>
         throw new RuntimeException("Unable to compute ScriptTagger schema.");
       }   
   }
-  */
   
   /* Omit this from our ScriptTaggerr so that the multi-input calls can be mapped to it.
   public List<FuncSpec> getArgToFuncMapping() throws FrontendException 
