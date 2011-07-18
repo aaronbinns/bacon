@@ -1,5 +1,5 @@
 --
--- Pig sample/test script for ScripTagger() UDF.
+-- Pig sample/test script for ScriptTagger() UDF.
 --
 REGISTER bacon.jar
 
@@ -13,7 +13,7 @@ text = LOAD 'test/script_tagger.txt' AS (words:chararray);
 --             output tokens will be the same as the input.
 --             Multi-script tokens will be split into a new token for
 --             each script.
-tokens = FOREACH text GENERATE FLATTEN(script_tag( tokenize( LOWER(words), '\\s+|[^\\p{L}]+'))) as (token:chararray,script:chararray);
+tokens = FOREACH text GENERATE FLATTEN(script_tag(tokenize(words,'[^\\p{L}]+'))) as (token:chararray,script:chararray);
 
 scripts = GROUP tokens BY script;
 scripts = FOREACH scripts 
@@ -32,7 +32,7 @@ DUMP scripts;
 --             result.
 --             NOTE: Since ScriptTagger() requires a bag as input,
 --             we use TOBAG() to wrap the string in a bag.
-tokens = FOREACH text GENERATE FLATTEN( script_tag( TOBAG( LOWER(words) ) ) ) as (token:chararray,script:chararray);
+tokens = FOREACH text GENERATE FLATTEN(script_tag(TOBAG(words))) as (token:chararray,script:chararray);
 
 scripts = GROUP tokens BY script;
 scripts = FOREACH scripts 
