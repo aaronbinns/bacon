@@ -95,6 +95,9 @@ public class ScriptTagger extends EvalFunc<DataBag>
         if ( input == null || input.size() < 1 ) return null;
         
         DataBag tokens = (DataBag) input.get(0);
+        
+        if ( tokens == null ) return null;
+        
         DataBag output = mBagFactory.newDefaultBag();
 
         for ( Tuple t : tokens  )
