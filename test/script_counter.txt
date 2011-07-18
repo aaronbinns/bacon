@@ -4,3 +4,5 @@ http://example.com/3	sha1:34567	ウェブ 画像 動画 地図 ニュース シ�
 http://example.com/4	sha1:45678	ਪੰਜਾਬੀپنجابی
 http://example.com/5	sha1:56789	বাংলা
 http://example.com/6	sha1:67890	官话官話Guānhuà
+http://example.com/7	sha1:abcde	
+http://example.com/8	sha1:bcdef	123
