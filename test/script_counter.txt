@@ -1,0 +1,6 @@
+http://example.com/1	sha1:12345	中文ThisکوردیsentenceአማርኛisالعربيةmixedЧӑвашлаtogether. "From my own observation, biànyi is seldom used in Chinese daily conversations. When we speak 便宜, we just mean "cheap."
+http://example.com/2	sha1:23456	a az qalıb breyn rinq intellektual oyunu üzrə yarışın zona mərhələləri keçirilib miq un qalıqlarının dənizdən çıxarılması davam edir məhəmməd peyğəmbərin karikaturalarını çap edən qəzetin baş redaktoru iş otağında ölüb آذربایجان دا انسان حاقلاری ائوی آچیلاجاق ب م ت ائلچيسي برمه موخاليفتي نين ليدئري ايله گؤروشه بيليب ترس شوونيسم فارس از آزادي ملتهاي تورکمن
+http://example.com/3	sha1:34567	ウェブ 画像 動画 地図 ニュース ショッピングGmailもっと見る ログイン فارسی دری تاجیکیфорсӣ-тоҷикӣ मानक हिन्दी) हिंदी उर्दू, هندی اردو
+http://example.com/4	sha1:45678	ਪੰਜਾਬੀپنجابی
+http://example.com/5	sha1:56789	বাংলা
+http://example.com/6	sha1:67890	官话官話Guānhuà
