@@ -8,11 +8,13 @@ REGISTER bacon.jar;
 -- Delmit/tokenize on all non-alphabetic characters.
 %default DELIM '[\\\\P{L}]+';
 
+%default INPUT 'test/script_counter.txt';
+
 DEFINE tokenize      org.archive.bacon.Tokenize();
 DEFINE strlen        org.archive.bacon.StringLength();
 DEFINE script_tag    org.archive.bacon.ScriptTagger();
 
-pages = LOAD 'test/script_counter.txt' AS (url:chararray,digest:chararray,words:chararray);
+pages = LOAD '$INPUT' AS (url:chararray,digest:chararray,words:chararray);
 
 pages = FOREACH pages GENERATE TOTUPLE(url,digest) AS id, tokenize( words, '$DELIM' ) AS tokens;
 
@@ -45,8 +47,7 @@ pages = FOREACH pages GENERATE group.id      AS id,
 --
 -- Where the 304 is the page length in characters and 189 is the # of
 -- character in LATIN.
-DUMP pages;
-
+-- DUMP pages;
 
 -- Group by script, and total the number of pages in that script,
 --  the total lengths of all the pages the script appears on,
