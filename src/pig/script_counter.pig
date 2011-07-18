@@ -14,27 +14,29 @@ DEFINE script_tag    org.archive.bacon.ScriptTagger();
 
 pages = LOAD 'test/script_counter.txt' AS (url:chararray,digest:chararray,words:chararray);
 
-pages = DISTINCT pages;
-pages = FOREACH  pages GENERATE TOTUPLE(url,digest) AS id, tokenize( words, '$DELIM' ) as tokens;
+pages = FOREACH pages GENERATE TOTUPLE(url,digest) AS id, tokenize( words, '$DELIM' ) AS tokens;
 
 -- Tag the tokens with their Unicode script, splitting multi-script
 -- tokens into more tokens as needed.
 pages = FOREACH pages GENERATE id, script_tag(tokens) AS tags;
 
+-- Omit pages with no tags.
+pages = FILTER pages BY tags is not null;
+
 -- Calculate the length of all the tokens on each page.
 pages = FOREACH pages GENERATE id, strlen(tags.token) AS pagelen, tags;
 
 -- Flatten out the tags and measure the size of each token.
-pages = FOREACH pages GENERATE id, pagelen, FLATTEN(tags) as (token:chararray,script:chararray);
-pages = FOREACH pages GENERATE id, pagelen, strlen(token) as tokenlen:long, script;
+pages = FOREACH pages GENERATE id, pagelen, FLATTEN(tags) AS (token:chararray,script:chararray);
+pages = FOREACH pages GENERATE id, pagelen, strlen(token) AS tokenlen:long, script;
 
 -- Group the pages by script.
 pages = GROUP pages BY (id,pagelen,script);
 
-pages = FOREACH pages GENERATE group.id      as id,
-                               group.pagelen as pagelen,
-                               group.script  as script,
-                               (long)SUM(pages.tokenlen) as scriptlen:long;
+pages = FOREACH pages GENERATE group.id      AS id,
+                               group.pagelen AS pagelen,
+                               group.script  AS script,
+                               (long)SUM(pages.tokenlen) AS scriptlen:long;
 
 -- We dump the pages here and get output of the following:
 --
@@ -50,6 +52,9 @@ DUMP pages;
 --  the total lengths of all the pages the script appears on,
 --  and the total length of all the tokens in that script.
 script_counts = GROUP pages BY script;
-script_counts = FOREACH script_counts GENERATE group as script, SIZE(pages) as numpages, SUM(pages.scriptlen) as scriptlen, SUM(pages.pagelen) as totallen ;
+script_counts = FOREACH script_counts GENERATE group AS script, SIZE(pages) AS numpages, SUM(pages.scriptlen) AS scriptlen, SUM(pages.pagelen) AS totallen ;
 
 DUMP script_counts;
+
+/*
+*/
