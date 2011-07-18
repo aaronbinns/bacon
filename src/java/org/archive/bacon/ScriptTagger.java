@@ -235,11 +235,11 @@ public class ScriptTagger extends EvalFunc<DataBag>
         tupleSchema.add(scriptFs);
         
         Schema.FieldSchema tupleFs;
-        tupleFs = new Schema.FieldSchema("token_script", tupleSchema, DataType.TUPLE);
+        tupleFs = new Schema.FieldSchema("tuple", tupleSchema, DataType.TUPLE);
         
         Schema bagSchema = new Schema(tupleFs);
         bagSchema.setTwoLevelAccessRequired(true);
-        Schema.FieldSchema bagFs = new Schema.FieldSchema("bag_of_tokenTuples",bagSchema, DataType.BAG);
+        Schema.FieldSchema bagFs = new Schema.FieldSchema("bag",bagSchema, DataType.BAG);
         
         return new Schema(bagFs); 
       }
