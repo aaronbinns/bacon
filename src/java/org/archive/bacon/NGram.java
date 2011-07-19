@@ -1,19 +1,19 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed
+ * with this work for additional information regarding copyright
+ * ownership.  The ASF licenses this file to you under the Apache
+ * License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License.  You may obtain a copy of
+ * the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied.  See the License for the specific language governing
+ * permissions and limitations under the License.
  */
 package org.archive.bacon;
 
@@ -33,13 +33,23 @@ import org.apache.pig.impl.logicalLayer.schema.Schema;
 import org.apache.pig.FuncSpec;
 
 /**
- * Similar to the Tokenize() UDF, but rather than emitting
- * single tokens, emit tuples with n-grams.  The number
- * of grams is passed in as the third parameter.  E.g.
+ * Takes a bag of values and emits a new bag containing
+ * n-grams.  The input parameters are:
+ *   DataBag      bag of tuples of any type
+ *   gram-length  length of gram
+ *   offset       offset between gram start positions
  *
- *   grams = NGram( 'foo bar baz', '[ ]+', 2 );
+ * For example, consider the bag
  *
- *  gives: { (foo,bar),(bar,baz) }
+ *   stuff = { 'foo', 'bar', 'baz', 'frotz' }
+ *
+ * We can generate 2-grams with:
+ *
+ *   grams = NGRam( stuff, 2 );
+ *
+ * yielding:
+ *
+ *   grams = { ('foo','bar'), ('bar','baz'), ('baz','frotz') }
  *
  * Source code derived from the Pig TOKENIZE() and STRSPLIT()
  * built-ins.
