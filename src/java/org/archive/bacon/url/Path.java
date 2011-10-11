@@ -31,7 +31,7 @@ public class Path extends EvalFunc<String>
   public String exec( Tuple input )
     throws IOException 
   {
-    if ( input == null || input.size() == 0 ) return null;
+    if ( input == null || input.size() < 1 ) return null;
 
     try
       {
