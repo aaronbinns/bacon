@@ -1,0 +1,14 @@
+http://example.org/
+http://example.org/foo
+http://example.org/foo/
+http://example.org/foo/bar/baz
+http://example.org/foo/bar/frotz/motz
+http://example.org/foo/bar/fizz
+http://example.org/moo/goo
+http://example.org/foo/poo
+http://evil.com/mirror/bar/baz
+http://evil.com/mirror/bar/frotz/motz
+http://evil.com/mirror/bar/fizz
+http://evil.com/mirror/tee/hee
+http://spam.net/goo
+http://spam.net/poo
