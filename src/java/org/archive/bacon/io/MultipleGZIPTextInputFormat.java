@@ -16,7 +16,7 @@
 /**
  * NOTICE: Derived from Hadoop TextInputFormat sources.
  */
-package org.archive.bacon.cdx;
+package org.archive.bacon.io;
 
 import java.io.*;
 import java.util.*;

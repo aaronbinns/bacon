@@ -13,7 +13,7 @@
  * implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package org.archive.bacon.cdx;
+package org.archive.bacon.io;
 
 import java.io.*;
 import java.util.*;
@@ -29,16 +29,16 @@ import org.apache.pig.data.*;
 import org.apache.pig.backend.hadoop.executionengine.mapReduceLayer.PigSplit;
 import org.apache.pig.backend.executionengine.ExecException;
 
-import org.archive.bacon.io.MultipleGZIPTextInputFormat;
+import org.apache.nutch.parse.*;
+import org.apache.nutch.metadata.Metadata;
 
 
 /**
- * Apache Pig UDF to load CDX files using multi-gzip compression.
+ * Apache Pig UDF to load text files using multi-gzip compression.
  *
- * It returns a Tuple with as many fields as in the CDX line, which is
- * usually 9.  The fields are untyped.
+ * It returns a Tuple with a single field: the entire line.
  */
-public class CompressedCDXLoader extends LoadFunc
+public class MultipleGZIPTextLoader extends LoadFunc
 {
   private RecordReader<LongWritable,Text> reader;
 
@@ -62,12 +62,7 @@ public class CompressedCDXLoader extends LoadFunc
         
         Text line = this.reader.getCurrentValue( );
         
-        String[] fields = line.toString().split( "[ ]" );
-        
-        for ( String field : fields )
-          {
-            tuple.append( field );
-          }
+        tuple.append( line );
         
         return tuple;
       }

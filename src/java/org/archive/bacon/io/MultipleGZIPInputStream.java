@@ -13,7 +13,7 @@
  * implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package org.archive.bacon.cdx;
+package org.archive.bacon.io;
 
 import java.io.*;
 import java.util.*;
