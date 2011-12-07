@@ -2,7 +2,7 @@
  * Tokenize the input on whitespace and ',' characters.  Then count
  * the number of instances of each token, ignoring empty tokens
  */
-REGISTER bacon.jar;
+REGISTER build/bacon-*.jar;
 DEFINE tokenize org.archive.bacon.Tokenize();
 
 lines     = LOAD 'test/tokenize.txt' AS (line:chararray);
