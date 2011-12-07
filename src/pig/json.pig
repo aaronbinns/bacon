@@ -1,8 +1,10 @@
+%default INPUT  'test/json.txt'
+%default OUTPUT '/tmp/test.json.gz'
 
 REGISTER build/bacon-*.jar
 REGISTER lib/json-20090211.jar
 
-text = LOAD 'test/json.txt' AS (url:chararray,digest:chararray,inlinks:long,message:chararray);
+text = LOAD '$INPUT' AS (url:chararray,digest:chararray,inlinks:long,message:chararray);
 
 text = FOREACH text GENERATE TOMAP( 'url', url, 
                                     'digest', digest, 
@@ -12,4 +14,11 @@ text = FOREACH text GENERATE TOMAP( 'url', url,
                                     'empty', null,
                                     'ha ha!', TOMAP( 'somelist', TOTUPLE('a','b','c','d'), 'submap', TOMAP( 'foo','bar' ) ) );
 
-STORE text INTO '/tmp/json.txt' USING org.archive.bacon.io.JSONStorage('false');
+dump text;
+
+rmf $OUTPUT
+STORE text INTO '$OUTPUT' USING org.archive.bacon.io.JSONStorage();
+
+text2 = LOAD '$OUTPUT' USING org.archive.bacon.io.JSONStorage() AS (m:map []);
+
+dump text2;
