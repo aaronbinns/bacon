@@ -22,11 +22,18 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapreduce.InputFormat;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.OutputFormat;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.Job;
 
-import org.apache.pig.StoreFunc;
+import org.apache.pig.backend.hadoop.executionengine.mapReduceLayer.PigSplit;
+import org.apache.pig.LoadFunc;
+import org.apache.pig.ResourceSchema;
+import org.apache.pig.StoreFuncInterface;
 import org.apache.pig.builtin.PigStorage;
 import org.apache.pig.data.DataBag;
 import org.apache.pig.data.DataType;
@@ -42,10 +49,9 @@ import org.apache.pig.data.Tuple;
  * In fact, this is really just a hack that expects to receive a Pig
  * 'map' object, converts it to a JSON string, then passes that string
  * on to PigStorage().
- *
  * 
  */
-public class JSONStorage extends StoreFunc
+public class JSONStorage extends LoadFunc implements StoreFuncInterface
 {
   // Use a '\0' as the delimiter.  It should never appear, so if it
   // does show up, we should notice it!
@@ -55,24 +61,44 @@ public class JSONStorage extends StoreFunc
 
   public JSONStorage( )
   {
-    this( "true" );
+
   }
 
-  public JSONStorage( String ignoreNulls )
+  /**
+   * StoreFuncInterface
+   */
+  @Override
+  public String relToAbsPathForStoreLocation( String location, Path curDir ) 
+    throws IOException
   {
-    this.ignoreNulls = Boolean.parseBoolean(ignoreNulls);
+    return this.ps.relToAbsPathForStoreLocation( location, curDir );
   }
 
+  @Override
   public OutputFormat getOutputFormat( )
   {
     return this.ps.getOutputFormat( );
   }
 
+  @Override
+  public void setStoreLocation( String location, Job job ) throws IOException
+  {
+    this.ps.setStoreLocation( location, job );
+  }
+
+  @Override
+  public void checkSchema(ResourceSchema s) throws IOException
+  {
+    this.ps.checkSchema( s );
+  }
+
+  @Override
   public void prepareToWrite(RecordWriter writer) 
   {
     this.ps.prepareToWrite( writer );
   }
 
+  @Override
   public void putNext( Tuple tuple ) throws IOException 
   {
     int size = tuple.size();
@@ -197,9 +223,45 @@ public class JSONStorage extends StoreFunc
       }
   }
 
-  public void setStoreLocation( String location, Job job ) throws IOException
+  @Override
+  public void setStoreFuncUDFContextSignature(String signature)
   {
-    this.ps.setStoreLocation( location, job );
+    this.ps.setStoreFuncUDFContextSignature( signature );
+  }
+
+  @Override
+  public void cleanupOnFailure(String location, Job job) throws IOException
+  {
+    this.ps.cleanupOnFailure( location, job );
+  }
+
+  /**
+   * LoadFunc
+   */
+  @Override
+  public void setLocation(String location, Job job) throws IOException
+  {
+    this.ps.setLocation( location, job );
+  }
+
+  @Override
+  public InputFormat getInputFormat() throws IOException
+  {
+    return this.ps.getInputFormat();
+  }
+  
+  @Override
+  public void prepareToRead(RecordReader reader, PigSplit split) throws IOException
+  {
+    this.ps.prepareToRead( reader, split );
+  }
+
+  @Override
+  public Tuple getNext() throws IOException
+  {
+    // FIXME: Parse JSON string returned from PigStorage, then convert
+    // that into Pig objects.
+    return this.ps.getNext();
   }
 
 }
