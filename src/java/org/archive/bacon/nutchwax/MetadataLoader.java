@@ -79,7 +79,7 @@ public class MetadataLoader extends LoadFunc
   {
     try 
       {
-        if ( ! reader.nextKeyValue( ) )
+        if ( ! this.reader.nextKeyValue( ) )
           {
             return null;
           }
