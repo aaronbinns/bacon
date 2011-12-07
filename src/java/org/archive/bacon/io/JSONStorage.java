@@ -23,21 +23,26 @@ import org.json.JSONObject;
 import org.json.JSONException;
 
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.RecordReader;
-import org.apache.hadoop.mapreduce.OutputFormat;
-import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.OutputFormat;
+import org.apache.hadoop.mapreduce.RecordReader;
+import org.apache.hadoop.mapreduce.RecordWriter;
 
-import org.apache.pig.backend.hadoop.executionengine.mapReduceLayer.PigSplit;
 import org.apache.pig.LoadFunc;
 import org.apache.pig.ResourceSchema;
 import org.apache.pig.StoreFuncInterface;
+import org.apache.pig.PigException;
+import org.apache.pig.backend.executionengine.ExecException;
+import org.apache.pig.backend.hadoop.executionengine.mapReduceLayer.PigSplit;
 import org.apache.pig.builtin.PigStorage;
 import org.apache.pig.data.DataBag;
 import org.apache.pig.data.DataType;
 import org.apache.pig.data.Tuple;
+import org.apache.pig.data.TupleFactory;
+import org.apache.pig.data.BagFactory;
 
 /**
  * Simple store function that writes out Pig 'map' objects as JSON
@@ -55,7 +60,11 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
 {
   // Use a '\0' as the delimiter.  It should never appear, so if it
   // does show up, we should notice it!
-  PigStorage ps = new PigStorage("\0");
+  PigStorage   ps = new PigStorage("\0");
+
+  RecordReader reader;
+  TupleFactory mTupleFactory = TupleFactory.getInstance();
+  BagFactory   mBagFactory   = BagFactory.getInstance();
 
   boolean ignoreNulls = true;
 
@@ -107,7 +116,7 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
     
     try
       {
-        JSONObject json = (JSONObject) getJSON( tuple.get(0) );
+        JSONObject json = (JSONObject) toJSON( tuple.get(0) );
 
         String jstring = json.toString();
 
@@ -122,7 +131,7 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
       }
   }
 
-  public Object getJSON( Object o )
+  public Object toJSON( Object o )
     throws JSONException, IOException
   {
     switch ( DataType.findType( o ) )
@@ -149,7 +158,7 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
         for( Map.Entry<String, Object> e: m.entrySet( ) )
           {
             String key   = e.getKey();
-            Object value = getJSON( e.getValue() );
+            Object value = toJSON( e.getValue() );
             
             // If the value is null, skip it.
             if ( null == value ) continue ;
@@ -164,7 +173,7 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
           Tuple t = (Tuple) o;
           for ( int i = 0; i < t.size(); ++i ) 
             {
-              Object value = getJSON( t.get(i) );
+              Object value = toJSON( t.get(i) );
               
               if ( null == value ) continue ;
               
@@ -185,7 +194,7 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
 
                 case 1:
                   {
-                    Object innerObject = getJSON( t.get(0) );
+                    Object innerObject = toJSON( t.get(0) );
 
                     if ( null == innerObject ) continue ;
 
@@ -197,7 +206,7 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
                   JSONArray innerList = new JSONArray();
                   for ( int i = 0; i < t.size(); ++i ) 
                     {
-                      Object innerObject = getJSON( t.get(i) );
+                      Object innerObject = toJSON( t.get(i) );
 
                       if ( null == innerObject ) continue ;
 
@@ -253,6 +262,9 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
   @Override
   public void prepareToRead(RecordReader reader, PigSplit split) throws IOException
   {
+    this.reader = reader;
+    
+    // FIXME: Do we still even need to call PigStorage.prepareToRead()?
     this.ps.prepareToRead( reader, split );
   }
 
@@ -261,7 +273,105 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
   {
     // FIXME: Parse JSON string returned from PigStorage, then convert
     // that into Pig objects.
-    return this.ps.getNext();
+    // return this.ps.getNext();
+
+    try
+      {
+        if ( ! this.reader.nextKeyValue() )
+          {
+            return null;
+          }
+
+        Text text = (Text) this.reader.getCurrentValue( );
+        
+        if ( text == null ) return null;
+
+        JSONObject json = new JSONObject( text.toString() );
+
+        // Tuple tuple = (Tuple) fromJSON( json );
+        Tuple tuple = mTupleFactory.newTuple( fromJSON( json ) );
+
+        return tuple;
+      }
+    catch ( JSONException je )
+      {
+        throw new IOException( je );
+      }
+    catch ( InterruptedException e  ) 
+      {
+        // From the Pig example/howto code.
+        int errCode = 6018;
+        String errMsg = "Error while reading input";
+        throw new ExecException(errMsg, errCode,PigException.REMOTE_ENVIRONMENT, e);
+      }
+  }
+
+  public Object fromJSON( Object o ) throws JSONException
+  {
+    if ( o instanceof String  ||
+         o instanceof Long    ||
+         o instanceof Double  ||
+         o instanceof Integer )
+      {
+        return o;
+      }
+    else if ( o instanceof JSONObject )
+      {
+        JSONObject json = (JSONObject) o;
+
+        Map<String,Object> map = new HashMap<String,Object>( json.length() );
+
+        for ( String key : JSONObject.getNames( json ) )
+          {
+            Object value = json.get( key );
+            
+            if ( json.isNull( key ) )
+              {
+                // TODO!
+              }
+            else
+              {
+                // FIXME: recurse the value
+                map.put( key, fromJSON( value ) );
+              }
+          }
+
+        /*
+          Tuple tuple = mTupleFactory.newTuple( map );
+          return tuple;
+        */
+        return map;
+      }
+    else if ( o instanceof JSONArray )
+      {
+        // FIXME: Add some magic to the key (like a leading @ char) to specify
+        //        if we convert from JSONArray to a Tuple or a Bag.
+        //        For now, just bag it.
+
+        JSONArray json = (JSONArray) o;
+        
+        List<Tuple> tuples = new ArrayList<Tuple>( json.length() );
+
+        for ( int i = 0; i < json.length() ; i++ )
+          {
+            tuples.add( mTupleFactory.newTuple( fromJSON( json.get(i) ) ) );
+          }
+
+        DataBag bag = mBagFactory.newDefaultBag( tuples );
+
+        return bag;
+      }
+    else if ( o instanceof Boolean )
+      {
+        // FIXME: Since Pig doesn't have a true boolean data type, is
+        // this even allowed?  Should we map it to 0/1?
+      }
+    else
+      {
+        // FIXME: What to do here?
+      }
+
+    return null;
   }
 
 }
