@@ -70,7 +70,6 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
 
   public JSONStorage( )
   {
-
   }
 
   /**
@@ -288,7 +287,6 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
 
         JSONObject json = new JSONObject( text.toString() );
 
-        // Tuple tuple = (Tuple) fromJSON( json );
         Tuple tuple = mTupleFactory.newTuple( fromJSON( json ) );
 
         return tuple;
@@ -336,10 +334,6 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
               }
           }
 
-        /*
-          Tuple tuple = mTupleFactory.newTuple( map );
-          return tuple;
-        */
         return map;
       }
     else if ( o instanceof JSONArray )
