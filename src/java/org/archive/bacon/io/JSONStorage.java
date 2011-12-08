@@ -66,8 +66,6 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
   TupleFactory mTupleFactory = TupleFactory.getInstance();
   BagFactory   mBagFactory   = BagFactory.getInstance();
 
-  boolean ignoreNulls = true;
-
   public JSONStorage( )
   {
   }
@@ -111,32 +109,43 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
   {
     int size = tuple.size();
 
-    if ( size != 1 ) throw new IOException( "Tuple must have a single value, which is a map." );
-    
     try
       {
-        JSONObject json = (JSONObject) toJSON( tuple.get(0) );
+        JSONObject json;
+        // If the tuple to serialize as JSON has one field which is a
+        // Map, then serialize that Map, not the tuple.  Otherwise,
+        // serialize the tuple.
+        if ( tuple.size() == 1 && DataType.findType( tuple.get(0) ) == DataType.MAP )
+          {
+            json = (JSONObject) toJSON( tuple.get(0) );
+          }
+        else
+          {
+            json = (JSONObject) toJSON( tuple );
+          }
 
         String jstring = json.toString();
 
-        // FIXME: Is this kosher to over-write the tuple?
-        tuple.set( 0, jstring );
+        Tuple output = mTupleFactory.newTuple( jstring );
         
-        this.ps.putNext( tuple );
+        this.ps.putNext( output );
       }
-    catch ( JSONException jsone )
+    catch ( JSONException je )
       {
-        throw new IOException( "JSON had a boo-boo", jsone );
+        throw new IOException( je );
       }
   }
 
+  /**
+   * Convert the given Pig object into a JSON object, recursively
+   * convert child objects as well.
+   */
   public Object toJSON( Object o )
     throws JSONException, IOException
   {
     switch ( DataType.findType( o ) )
       {
       case DataType.NULL:
-        if ( this.ignoreNulls ) return null;
         return JSONObject.NULL;
 
       case DataType.BOOLEAN:
@@ -152,38 +161,38 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
         return o.toString( );
         
       case DataType.MAP:
-        Map<String,Object> m = (Map<String,Object>) o;
-        JSONObject json = new JSONObject();
-        for( Map.Entry<String, Object> e: m.entrySet( ) )
-          {
-            String key   = e.getKey();
-            Object value = toJSON( e.getValue() );
-            
-            // If the value is null, skip it.
-            if ( null == value ) continue ;
+        {
+          Map<String,Object> m = (Map<String,Object>) o;
+          JSONObject json = new JSONObject();
+          for( Map.Entry<String, Object> e: m.entrySet( ) )
+            {
+              String key   = e.getKey();
+              Object value = toJSON( e.getValue() );
+              
+              json.put( key, value );
+            }
+          return json;
+        }
 
-            json.put( key, value );
-          }
-        return json;
-        
       case DataType.TUPLE:
         {
-          JSONArray values = new JSONArray();
+          JSONObject json = new JSONObject( );
+
           Tuple t = (Tuple) o;
           for ( int i = 0; i < t.size(); ++i ) 
             {
               Object value = toJSON( t.get(i) );
               
-              if ( null == value ) continue ;
-              
-              values.put( value );
+              json.put( "$" + i , value );
             }
-          return values;
+
+          return json;
         }
 
       case DataType.BAG:
         {
           JSONArray values = new JSONArray();
+
           for ( Tuple t : ((DataBag) o) )
             {
               switch ( t.size() )
@@ -195,8 +204,6 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
                   {
                     Object innerObject = toJSON( t.get(0) );
 
-                    if ( null == innerObject ) continue ;
-
                     values.put( innerObject );
                   }
                   break;
@@ -207,8 +214,6 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
                     {
                       Object innerObject = toJSON( t.get(i) );
 
-                      if ( null == innerObject ) continue ;
-
                       innerList.put( innerObject );
                     }
                   
@@ -217,6 +222,7 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
                 }
               
             }
+
           return values;
         }
 
@@ -270,11 +276,7 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
   @Override
   public Tuple getNext() throws IOException
   {
-    // FIXME: Parse JSON string returned from PigStorage, then convert
-    // that into Pig objects.
-    // return this.ps.getNext();
-
-    try
+     try
       {
         if ( ! this.reader.nextKeyValue() )
           {
@@ -287,7 +289,17 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
 
         JSONObject json = new JSONObject( text.toString() );
 
-        Tuple tuple = mTupleFactory.newTuple( fromJSON( json ) );
+        Object o = fromJSON( json );
+
+        Tuple tuple;
+        if ( o instanceof Map )
+          {
+            tuple = mTupleFactory.newTuple( o  );
+          }
+        else
+          {
+            tuple = (Tuple) o;
+          }
 
         return tuple;
       }
@@ -304,7 +316,11 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
       }
   }
 
-  public Object fromJSON( Object o ) throws JSONException
+  /**
+   * Convert JSON object into a Pig object, recursively convert
+   * children as well.
+   */
+  public Object fromJSON( Object o ) throws IOException, JSONException
   {
     if ( o instanceof String  ||
          o instanceof Long    ||
@@ -312,6 +328,10 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
          o instanceof Integer )
       {
         return o;
+      }
+    else if ( JSONObject.NULL.equals(o) )
+      {
+        return null;
       }
     else if ( o instanceof JSONObject )
       {
@@ -323,25 +343,35 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
           {
             Object value = json.get( key );
             
-            if ( json.isNull( key ) )
+            // FIXME: recurse the value
+            map.put( key, fromJSON( value ) );
+          }
+        
+        // Now, check to see if the map keys match the formula for
+        // a Tuple, that is if they are: "$0", "$1", "$2", ...
+        
+        // First, peek to see if there is a "$0" key, if so, then 
+        // start moving the map entries into a Tuple.
+        if ( map.containsKey( "$0" ) )
+          {
+            Tuple tuple = mTupleFactory.newTuple( map.size() );
+
+            for ( int i = 0 ; i < map.size() ; i++ )
               {
-                // TODO!
+                // If any of the expected $N keys is not found, give
+                // up and return the map.
+                if ( ! map.containsKey( "$" + i ) ) return map;
+                
+                tuple.set( i, map.get( "$" + i ) );
               }
-            else
-              {
-                // FIXME: recurse the value
-                map.put( key, fromJSON( value ) );
-              }
+
+            return tuple;
           }
 
         return map;
       }
     else if ( o instanceof JSONArray )
       {
-        // FIXME: Add some magic to the key (like a leading @ char) to specify
-        //        if we convert from JSONArray to a Tuple or a Bag.
-        //        For now, just bag it.
-
         JSONArray json = (JSONArray) o;
         
         List<Tuple> tuples = new ArrayList<Tuple>( json.length() );
@@ -357,15 +387,19 @@ public class JSONStorage extends LoadFunc implements StoreFuncInterface
       }
     else if ( o instanceof Boolean )
       {
-        // FIXME: Since Pig doesn't have a true boolean data type, is
-        // this even allowed?  Should we map it to 0/1?
+        // Since Pig doesn't have a true boolean data type, we map it to
+        // String values "true" and "false".
+        if ( ((Boolean) o).booleanValue() )
+          {
+            return "true";
+          }
+        return "false";
       }
     else
       {
         // FIXME: What to do here?
+        throw new IOException( "Unknown data-type serializing from JSON: " + o );
       }
-
-    return null;
   }
 
 }
