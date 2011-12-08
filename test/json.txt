@@ -1,2 +1,2 @@
-http://example.org/	12345abcde	42	other fun stuff!
-http://archive.org/	zyxwv09876	23	not so fun stuff
+http://example.org/	12345abcde	other fun stuff!
+http://archive.org/	zyxwv09876	not so fun stuff
