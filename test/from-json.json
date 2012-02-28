@@ -1,0 +1,2 @@
+{ "foo":"foo", "bar": [ "baz", "frotz" ] }
+{ "name":"atari", num:800, "empty":{ } }
