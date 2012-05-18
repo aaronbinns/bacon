@@ -81,6 +81,12 @@ import org.apache.pig.FuncSpec;
  * Unicode blocks and grouping them together according to our own
  * decision about what goes together.  See the getScript() method for
  * specifics.
+ *
+ * NOTE following-up...
+ *
+ * I've replaced the hacks to deal with Java 6's Unicode 4.0 with nice
+ * Java7 API for Unicode 6.0, in particular Character.UnicodeScript.
+ * As a consequence, this code only works with Java 7, not Java 6.
  */
 public class ScriptTagger extends EvalFunc<DataBag> 
 {
@@ -168,55 +174,9 @@ public class ScriptTagger extends EvalFunc<DataBag>
 
   String getScript( int codePoint )
   {
-    Character.UnicodeBlock block = Character.UnicodeBlock.of( codePoint );
+    Character.UnicodeScript script = Character.UnicodeScript.of( codePoint );
 
-    if ( block == BASIC_LATIN
-         || block == LATIN_1_SUPPLEMENT 
-         || block == LATIN_EXTENDED_A 
-         || block == LATIN_EXTENDED_ADDITIONAL 
-         || block == LATIN_EXTENDED_B 
-         || block == IPA_EXTENSIONS )
-      {
-        return "LATIN";
-      }
-
-    if ( block == ARABIC 
-         || block == ARABIC_PRESENTATION_FORMS_A 
-         || block == ARABIC_PRESENTATION_FORMS_B )
-      {
-        return "ARABIC";
-      }
-
-    if ( block == CJK_COMPATIBILITY 
-         || block == CJK_COMPATIBILITY_FORMS 
-         || block == CJK_COMPATIBILITY_IDEOGRAPHS 
-         || block == CJK_COMPATIBILITY_IDEOGRAPHS_SUPPLEMENT 
-         || block == CJK_RADICALS_SUPPLEMENT 
-         || block == CJK_SYMBOLS_AND_PUNCTUATION 
-         || block == CJK_UNIFIED_IDEOGRAPHS 
-         || block == CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A 
-         || block == CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B 
-         // These are Japanese-only, but we map them all into one generic CJK "script"
-         || block == KATAKANA 
-         || block == KATAKANA_PHONETIC_EXTENSIONS 
-         || block == HIRAGANA
-         )
-      {
-        return "CJK";
-      }
-
-    if ( block == CYRILLIC 
-         || block == CYRILLIC_SUPPLEMENTARY )
-      {
-        return "CYRILLIC";
-      }
-
-    if ( block == GREEK || block == GREEK_EXTENDED )
-      {
-        return "GREEK";
-      }
-
-    return block.toString();
+    return script.toString();
   }
   
   /*
@@ -252,7 +212,7 @@ public class ScriptTagger extends EvalFunc<DataBag>
       }   
   }
   
-  /* Omit this from our ScriptTaggerr so that the multi-input calls can be mapped to it.
+  /* Omit this from our ScriptTagger so that the multi-input calls can be mapped to it.
   public List<FuncSpec> getArgToFuncMapping() throws FrontendException 
   {
     List<FuncSpec> funcList = new ArrayList<FuncSpec>();

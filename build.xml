@@ -30,8 +30,8 @@
            destdir="${build.dir}/classes"
            debug="true"
            verbose="false"
-           source="1.6"
-           target="1.6"
+           source="1.7"
+           target="1.7"
            encoding="UTF-8"
            fork="true"
            deprecation="false">
