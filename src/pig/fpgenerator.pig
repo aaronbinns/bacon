@@ -1,7 +1,7 @@
 
-REGISTER bacon.jar
+REGISTER build/bacon*.jar
 
-DEFINE fp org.archive.bacon.FPGenerator();
+DEFINE fp org.archive.bacon.FPGenerator;
 
 text = LOAD 'test/fpgenerator.txt' AS (url:chararray,digest:chararray);
 
