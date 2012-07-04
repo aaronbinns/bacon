@@ -1,5 +1,5 @@
 
-REGISTER bacon.jar
+REGISTER build/bacon-*.jar;
 
 DEFINE tokenize org.archive.bacon.Tokenize();
 DEFINE ngram    org.archive.bacon.NGram();

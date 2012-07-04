@@ -3,7 +3,7 @@
 -- a page, and count the percentage of the page in each script.
 --
 
-REGISTER bacon.jar
+REGISTER build/bacon-*.jar;
 
 DEFINE tokenize   org.archive.bacon.Tokenize();
 DEFINE script_tag org.archive.bacon.ScriptTagger();

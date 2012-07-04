@@ -1,6 +1,7 @@
 
 
-REGISTER bacon.jar;
+REGISTER build/bacon-*.jar;
+
 DEFINE pathexpand org.archive.bacon.url.PathExpand();
 
 data = LOAD 'test/path-expand.txt' AS (url:chararray);

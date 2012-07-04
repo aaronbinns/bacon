@@ -5,7 +5,7 @@
 %default INPUT=''
 %default OUTPUT=''
 
-REGISTER bacon.jar
+REGISTER build/bacon-*.jar;
 REGISTER nutchwax-0.13.jar
 
 DEFINE tokenize  org.archive.bacon.Tokenize();

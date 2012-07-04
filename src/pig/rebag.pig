@@ -1,5 +1,6 @@
 
-REGISTER bacon.jar;
+REGISTER build/bacon-*.jar;
+
 DEFINE rebag org.archive.bacon.ReBag();
 lines  = LOAD 'test/rebag.txt' AS (line:chararray);
 tuples = FOREACH lines  GENERATE STRSPLIT(line,'[ ]');

@@ -15,7 +15,7 @@
 %default WEIRDNESS='weirdness'
 %default ONLY_DATES='only_dates'
 
-REGISTER bacon.jar
+REGISTER build/bacon-*.jar;
 REGISTER lib/nutchwax-0.13.jar
 
 meta  = LOAD '$SEGMENT' 

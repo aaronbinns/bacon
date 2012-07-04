@@ -19,7 +19,7 @@
  * Then we simply iterate through the pairs and diff the nums.
  */
 
-REGISTER bacon.jar;
+REGISTER build/bacon-*.jar;
 
 DEFINE ngram org.archive.bacon.NGram();
 

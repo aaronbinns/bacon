@@ -19,7 +19,7 @@
  * same anchor text.
  */
 
-REGISTER bacon.jar ; 
+REGISTER build/bacon-*.jar;
 
 /* Load the link graph in the form the same as the example table above. */
 links1 = LOAD 'segments/*/parse_data' USING OutlinkLoader AS (from:chararray,to:chararray,anchor:chararray);

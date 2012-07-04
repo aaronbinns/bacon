@@ -6,7 +6,7 @@
 %default INPUT=''
 %default OUTPUT=''
 
-REGISTER bacon.jar
+REGISTER build/bacon-*.jar
 REGISTER lib/nutchwax-0.13.jar
 
 pages = LOAD '$INPUT' 

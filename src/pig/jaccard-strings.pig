@@ -10,7 +10,7 @@
 --
 %default GRAPH 'test/jaccard.txt';
 
-REGISTER bacon.jar;
+REGISTER build/bacon-*.jar;
 DEFINE tokenize  org.archive.bacon.Tokenize();
 DEFINE stringize org.archive.bacon.Stringize();
 

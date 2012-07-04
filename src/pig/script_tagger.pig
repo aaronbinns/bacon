@@ -1,7 +1,7 @@
 --
 -- Pig sample/test script for ScriptTagger() UDF.
 --
-REGISTER bacon.jar
+REGISTER build/bacon-*.jar
 
 DEFINE script_tag org.archive.bacon.ScriptTagger();
 DEFINE tokenize   org.archive.bacon.Tokenize();

@@ -18,7 +18,7 @@
  * Find links where the anchor text matches the title of the linked-to page.
  */
 
-REGISTER bacon.jar ; 
+REGISTER build/bacon-*.jar;
 
 /* Load the link graph in the form the same as the example table above. */
 meta  = LOAD 'segments/*/parse_data' USING MetadataLoader AS (url:chararray,title:chararray,length:long,date:chararray,type:chararray,collection:chararray);

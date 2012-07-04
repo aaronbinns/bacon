@@ -2,7 +2,7 @@
 -- Sample Pig script which demonstrates how to count the number characters
 -- in different Unicode scripts, then total them across pages and scripts.
 --
-REGISTER bacon.jar;
+REGISTER build/bacon-*.jar;
 
 -- Default tokenizing delimiter.  Note the double-escaping of the \ character.
 -- Delmit/tokenize on all non-alphabetic characters.
