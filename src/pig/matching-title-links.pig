@@ -20,6 +20,9 @@
 
 REGISTER build/bacon-*.jar;
 
+DEFINE HOST   org.archive.bacon.url.Host();
+DEFINE DOMAIN org.archive.bacon.url.Domain();
+
 /* Load the link graph in the form the same as the example table above. */
 meta  = LOAD 'segments/*/parse_data' USING MetadataLoader AS (url:chararray,title:chararray,length:long,date:chararray,type:chararray,collection:chararray);
 links = LOAD 'segments/*/parse_data' USING OutlinkLoader AS (from:chararray,to:chararray,anchor:chararray);
@@ -29,7 +32,7 @@ meta  = FILTER meta  BY title  != '';
 links = FILTER links BY from   != to AND anchor != '';
 
 /* Generate domains for the from and to urls */
-links = FOREACH links GENERATE from, DOMAIN( from ) as fromdomain, to, DOMAIN( to ) as todomain, anchor ;
+links = FOREACH links GENERATE from, DOMAIN(HOST(from)) as fromdomain, to, DOMAIN(HOST(to)) as todomain, anchor ;
 
 /* Eliminate intra-domain links */
 links = FILTER links BY fromdomain != todomain ;

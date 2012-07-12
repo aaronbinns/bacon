@@ -1,7 +1,24 @@
+/*
+ * Copyright 2011 Internet Archive
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You
+ * may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
 --
 -- Sample Pig script which demonstrates how to count the number characters
 -- in different Unicode scripts, then total them across pages and scripts.
 --
+
 REGISTER build/bacon-*.jar;
 
 -- Default tokenizing delimiter.  Note the double-escaping of the \ character.
@@ -32,7 +49,7 @@ pages = FOREACH pages GENERATE id, strlen(tags.token) AS pagelen, tags;
 pages = FOREACH pages GENERATE id, pagelen, FLATTEN(tags) AS (token:chararray,script:chararray);
 pages = FOREACH pages GENERATE id, pagelen, strlen(token) AS tokenlen:long, script;
 
--- Group the pages by script.
+-- Group the pages.
 pages = GROUP pages BY (id,pagelen,script);
 
 pages = FOREACH pages GENERATE group.id      AS id,
@@ -47,7 +64,7 @@ pages = FOREACH pages GENERATE group.id      AS id,
 --
 -- Where the 304 is the page length in characters and 189 is the # of
 -- character in LATIN.
--- DUMP pages;
+DUMP pages;
 
 -- Group by script, and total the number of pages in that script,
 --  the total lengths of all the pages the script appears on,
@@ -57,5 +74,3 @@ script_counts = FOREACH script_counts GENERATE group AS script, SIZE(pages) AS n
 
 DUMP script_counts;
 
-/*
-*/

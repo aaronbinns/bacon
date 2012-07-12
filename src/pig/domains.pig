@@ -14,9 +14,9 @@
  * permissions and limitations under the License.
  */
 
-/*
- * Emit the domain of each URL.
- */
+--
+-- Emit the domain of each URL.
+--
 
 REGISTER build/bacon-*.jar ;
 
