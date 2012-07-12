@@ -17,6 +17,7 @@ package org.archive.bacon.url;
 
 import java.io.*;
 import java.net.*;
+import java.util.*;
 
 import org.apache.pig.EvalFunc;
 import org.apache.pig.data.Tuple;
@@ -29,6 +30,7 @@ import org.apache.pig.impl.util.WrappedIOException;
 public class Domain extends EvalFunc<String>
 {
   IDNHelper helper;
+  Map<String,String> cache = new HashMap<String,String>();
 
   public Domain( )
     throws IOException
@@ -53,9 +55,13 @@ public class Domain extends EvalFunc<String>
 
     try
       {
-        URL u = new URL( (String) input.get(0) );
+        String hostname = (String) input.get(0);
 
-        String domain = this.helper.getDomain( u );
+        String cachedValue = this.cache.get( hostname );
+        
+        if ( cachedValue != null ) return cachedValue;
+
+        String domain = this.helper.getDomain( hostname );
         
         // If domain cannot be determined, return empty string.
         if ( domain == null ) domain = "";
@@ -63,12 +69,9 @@ public class Domain extends EvalFunc<String>
         // Ensure i18n domains are in Unicode format.
         domain = java.net.IDN.toUnicode( domain, java.net.IDN.ALLOW_UNASSIGNED );
 
+        this.cache.put( hostname, domain );
+
         return domain;
-      }
-    catch ( MalformedURLException mue )
-      {
-        // If not a valid URL, just return an empty string.
-        return "";
       }
     catch ( Exception e )
       {
