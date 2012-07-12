@@ -15,15 +15,16 @@
  */
 
 /*
- * Emit the domain of each link.
+ * Emit the domain of each URL.
  */
 
-REGISTER build/bacon-*.jar ; 
+REGISTER build/bacon-*.jar ;
 
-/* Load the link graph in the form the same as the example table above. */
-links1 = LOAD 'segments/*/parse_data' USING OutlinkLoader AS (from:chararray,to:chararray,anchor:chararray);
+DEFINE HOST   org.archive.bacon.url.Host();
+DEFINE DOMAIN org.archive.bacon.url.Domain();
 
-/* Transform links to just be at the domain level */
-links2 = FOREACH links GENERATE DOMAIN( from ), DOMAIN( to );
+data = LOAD 'test/domains.txt' AS (url:chararray);
 
-DUMP links2;
+data = FOREACH data GENERATE url, HOST(url), DOMAIN(HOST(url));
+
+dump data;
