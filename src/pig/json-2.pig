@@ -30,7 +30,7 @@
 %default OUTPUT '/tmp/json-2.json'
 
 REGISTER build/bacon-*.jar
-REGISTER lib/json-*
+REGISTER lib/json-*.jar
 
 text = LOAD '$INPUT' AS (url:chararray,digest:chararray,message:chararray);
 
