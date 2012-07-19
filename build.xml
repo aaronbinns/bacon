@@ -15,8 +15,8 @@
       </exec>
       <echo message="Git revision: ${head}"/>
       <exec executable="git" outputproperty="dirty">
-        <arg value="diff" />
-        <arg value="--shortstat" />
+        <arg value="status" />
+        <arg value="-s" />
       </exec>
       <condition property="@{output}" value="${head}" else="${head}-dirty">
         <equals arg1="${dirty}" arg2="" />
