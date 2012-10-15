@@ -43,6 +43,8 @@
         </fileset>
       </classpath>
     </javac>
+    <copy file="${src.dir}/java/com/cybozu/labs/langdetect/util/messages.properties" 
+          todir="${build.dir}/classes/com/cybozu/labs/langdetect/util/" />
   </target>
 
   <target name="jar" depends="compile">
@@ -53,6 +55,8 @@
       <fileset file="${build.dir}/version" />
       <fileset dir="${build.dir}/classes" />
       <fileset file="${lib.dir}/effective_tld_names.dat" />
+      <fileset file="${lib.dir}/langdetect-profiles.json" />
+      <fileset file="${lib.dir}/langdetect-profiles-small.json" />
     </jar>
   </target>
 
