@@ -229,12 +229,12 @@ public class Detector {
      * 
      */
     private void detectBlock() throws LangDetectException {
-        cleaningText();
+
         ArrayList<String> ngrams = extractNGrams();
-        if (ngrams.size()==0)
-            throw new LangDetectException(ErrorCode.CantDetectError, "no features in text");
-        
+
         langprob = new double[langlist.size()];
+
+        if ( ngrams.size() == 0 ) return ;
 
         Random rand = new Random();
         if (seed != null) rand.setSeed(seed);
