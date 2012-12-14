@@ -13,6 +13,11 @@ text = LOAD 'test/script_tagger.txt' AS (words:chararray);
 --             output tokens will be the same as the input.
 --             Multi-script tokens will be split into a new token for
 --             each script.
+--
+-- NOTE: This approach does *NOT* work if the input text contains
+--       surrogate pairs.  The tokenize() function calls
+--       String.split() and the regex passed to split doesn't
+--       recognize surrogate pairs (AFAICT).
 tokens = FOREACH text GENERATE FLATTEN(script_tag(tokenize(words,'[^\\p{L}]+'))) as (token:chararray,script:chararray);
 
 scripts = GROUP tokens BY script;
@@ -30,8 +35,9 @@ DUMP scripts;
 --             untouched and are ignored for script identification.
 --             Thus, a string w/o any characters will yield an empty
 --             result.
---             NOTE: Since ScriptTagger() requires a bag as input,
---             we use TOBAG() to wrap the string in a bag.
+--
+-- NOTE: Since ScriptTagger() requires a bag as input, we use TOBAG()
+--       to wrap the string in a bag.
 tokens = FOREACH text GENERATE FLATTEN(script_tag(TOBAG(words))) as (token:chararray,script:chararray);
 
 scripts = GROUP tokens BY script;
