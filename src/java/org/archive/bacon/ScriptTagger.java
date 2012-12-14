@@ -117,51 +117,51 @@ public class ScriptTagger extends EvalFunc<DataBag>
             // Normalize the Unicode string to NFC form.
             token = Normalizer.normalize( token, Normalizer.Form.NFC );
 
-          loop: 
-            while ( true )
+            // Iterate through the token and split it up into
+            // subtokens whereever the script changes.
+            int len = token.length();
+            
+            if ( len < 1 ) break ;
+            
+            int codePoint = token.codePointAt( 0 );
+            
+            String script = getScript( codePoint );
+            
+            for ( int i = Character.charCount(codePoint); i < len ; i += Character.charCount(codePoint) )
               {
-                int cpLength = token.codePointCount( 0, token.length() );
-
-                if ( cpLength < 1 ) break ;
-
-                int codePoint = token.codePointAt( 0 );
+                codePoint = token.codePointAt(i);
                 
-                String script = getScript(codePoint);
+                if ( ! Character.isLetter( codePoint ) ) continue ;
                 
-                for ( int cpi = 1 ; cpi < cpLength; cpi++ )
+                String nextScript = getScript( codePoint );
+                
+                if ( ! script.equals( nextScript ) )
                   {
-                    codePoint = token.codePointAt( token.offsetByCodePoints(0,cpi) );
-
-                    if ( ! Character.isLetter( codePoint ) ) continue ;
+                    // Script change, save the token so far.
+                    String subtoken = token.substring( 0, i );
                     
-                    String nextScript = getScript( codePoint );
+                    // Add tagged subtoken to output
+                    Tuple tout = mTupleFactory.newTuple( 2 );
+                    tout.set( 0, subtoken );
+                    tout.set( 1, script );
                     
-                    if ( ! script.equals( nextScript ) )
-                      {
-                        String subtoken = token.substring( 0, token.offsetByCodePoints(0,cpi) );
-                        
-                        // Add tagged subtoken to output
-                        Tuple tout = mTupleFactory.newTuple( 2 );
-                        tout.set( 0, subtoken );
-                        tout.set( 1, script );
-
-                        output.add( tout );
-
-                        script = nextScript;
-                        token = token.substring( token.offsetByCodePoints(0,cpi) );
-
-                        continue loop;
-                      }
+                    output.add( tout );
+                    
+                    // Continue scanning the rest of the token for
+                    // another script change.
+                    script = nextScript;
+                    token = token.substring( i );
+                    len = len - i;
+                    i = 0;
                   }
-                
-                Tuple tout = mTupleFactory.newTuple( 2 );
-                tout.set( 0, token );
-                tout.set( 1, script );
-
-                output.add( tout );
-
-                break ;
               }
+            
+            // Save the last token and its script tag.
+            Tuple tout = mTupleFactory.newTuple( 2 );
+            tout.set( 0, token );
+            tout.set( 1, script );
+            
+            output.add( tout );
           }
 
         return output;
