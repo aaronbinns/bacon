@@ -20,7 +20,7 @@ package org.archive.bacon;
 import java.io.*;
 import java.text.*;
 import java.util.*;
-import static java.lang.Character.UnicodeBlock.*;
+import static java.lang.Character.UnicodeScript.*;
 
 import org.apache.pig.EvalFunc;
 import org.apache.pig.PigException;
@@ -87,6 +87,12 @@ import org.apache.pig.FuncSpec;
  * I've replaced the hacks to deal with Java 6's Unicode 4.0 with nice
  * Java7 API for Unicode 6.0, in particular Character.UnicodeScript.
  * As a consequence, this code only works with Java 7, not Java 6.
+ *
+ * TODO: Consider UAX #29: Unicode Text Segmentation
+ *       http://www.unicode.org/reports/tr29/
+ *       which lays out the rules for splitting/segmenting text on
+ *       word/setence/line boundaries based on a whole mess of rules.
+ *       Maybe icu4j has an UAX #29 implemenation?
  */
 public class ScriptTagger extends EvalFunc<DataBag> 
 {
@@ -114,8 +120,8 @@ public class ScriptTagger extends EvalFunc<DataBag>
             
             if ( token.length() == 0 ) continue;
 
-            // Normalize the Unicode string to NFC form.
-            token = Normalizer.normalize( token, Normalizer.Form.NFC );
+            // Normalize the Unicode string with NFKC.
+            token = Normalizer.normalize( token, Normalizer.Form.NFKC );
 
             // Iterate through the token and split it up into
             // subtokens whereever the script changes.
@@ -135,17 +141,23 @@ public class ScriptTagger extends EvalFunc<DataBag>
                 
                 String nextScript = getScript( codePoint );
                 
-                if ( ! script.equals( nextScript ) )
+                if ( ! nextScript.equals( script      ) &&
+                     ! nextScript.equals( "COMMON"    ) && 
+                     ! nextScript.equals( "INHERITED" ) )
                   {
                     // Script change, save the token so far.
                     String subtoken = token.substring( 0, i );
                     
                     // Add tagged subtoken to output
-                    Tuple tout = mTupleFactory.newTuple( 2 );
-                    tout.set( 0, subtoken );
-                    tout.set( 1, script );
-                    
-                    output.add( tout );
+                    if ( ! script.equals( "COMMON"    ) && 
+                         ! script.equals( "INHERITED" ) )
+                      {
+                        Tuple tout = mTupleFactory.newTuple( 2 );
+                        tout.set( 0, subtoken );
+                        tout.set( 1, script );
+                        
+                        output.add( tout );
+                      }
                     
                     // Continue scanning the rest of the token for
                     // another script change.
@@ -156,12 +168,16 @@ public class ScriptTagger extends EvalFunc<DataBag>
                   }
               }
             
-            // Save the last token and its script tag.
-            Tuple tout = mTupleFactory.newTuple( 2 );
-            tout.set( 0, token );
-            tout.set( 1, script );
+            // Save the last token and its script tag, as long as it is not COMMON nor INHERITED.
+            if ( ! script.equals( "COMMON"    ) && 
+                 ! script.equals( "INHERITED" ) )
+              {
+                Tuple tout = mTupleFactory.newTuple( 2 );
+                tout.set( 0, token );
+                tout.set( 1, script );
             
-            output.add( tout );
+                output.add( tout );
+              }
           }
 
         return output;
@@ -172,15 +188,30 @@ public class ScriptTagger extends EvalFunc<DataBag>
       }
   }
 
+
+  /**
+   * Return the Unicode script for the given codepoint.  Due to
+   * Unicode Han unification, for Chinese, Japanese and Korean scripts
+   * we return "CJK" rather than the actual Unicode script name.
+   */
   String getScript( int codePoint )
   {
     Character.UnicodeScript script = Character.UnicodeScript.of( codePoint );
 
+    switch ( script )
+      {
+      case HAN:
+      case KATAKANA:
+      case HIRAGANA:
+      case HANGUL:
+        return "CJK";
+      }
+
     return script.toString();
   }
   
-  /*
-   *
+  /**
+   * Return Pig Schema of output values.
    */
   @SuppressWarnings("deprecation")
   @Override
