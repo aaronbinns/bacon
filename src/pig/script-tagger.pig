@@ -9,7 +9,7 @@ DEFINE tokenize   org.archive.bacon.Tokenize();
 text = LOAD 'test/script_tagger.txt' AS (words:chararray);
 
 -- Approach 1: Tokenize the string before passing to ScriptTagger.
---             If there are no mutli-script tokens, then the number of
+--             If there are no multi-script tokens, then the number of
 --             output tokens will be the same as the input.
 --             Multi-script tokens will be split into a new token for
 --             each script.
