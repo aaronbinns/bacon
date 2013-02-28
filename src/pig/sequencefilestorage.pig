@@ -18,7 +18,12 @@ data = FOREACH data GENERATE null, value;
 STORE data INTO '/tmp/sequencefilestorage2' USING org.archive.bacon.io.SequenceFileStorage( 'org.apache.hadoop.io.Text', 
                                                                                             'org.apache.hadoop.io.DoubleWritable' );
 
-data = FOREACH data GENERATE null, null;
+data = FOREACH data GENERATE value;
 
 STORE data INTO '/tmp/sequencefilestorage3' USING org.archive.bacon.io.SequenceFileStorage( 'org.apache.hadoop.io.Text', 
+                                                                                            'org.apache.hadoop.io.DoubleWritable' );
+
+data = FOREACH data GENERATE null, null;
+
+STORE data INTO '/tmp/sequencefilestorage4' USING org.archive.bacon.io.SequenceFileStorage( 'org.apache.hadoop.io.Text', 
                                                                                             'org.apache.hadoop.io.BytesWritable' );

@@ -185,22 +185,38 @@ public class SequenceFileStorage extends StoreFunc
   }
 
   /**
-   * Tuples must have two entries, the first for the SequenceFile
-   * 'key' and the second for the 'value'.
+   * SequenceFiles require a key/value pair.
+   *
+   * For convenience, we allow an incoming tuple ot have either one or
+   * two entries.
+   *
+   * If it has two entries, then we take them as the key and value.
+   *
+   * If there is only one entry, then it is taken as the value and a
+   * 'null' key is used.
    */
   public void putNext( Tuple tuple ) throws IOException
   {
     try
       {
+        Writable key, value;
+ 
         int size = tuple.size();
 
-        if ( size != 2 )
+        if ( size == 1 )
           {
-            throw new IOException( "Invalid tuple size, must be 2: " + size );
+            key   = this.nullKey;
+            value = getWritable( tuple.get(0), this.nullValue );
           }
-        
-        Writable key   = getWritable( tuple.get(0), this.nullKey   );
-        Writable value = getWritable( tuple.get(1), this.nullValue );
+        else if ( size == 2 )
+          {
+            key   = getWritable( tuple.get(0), this.nullKey   );
+            value = getWritable( tuple.get(1), this.nullValue );
+          }
+        else
+          {
+            throw new IOException( "Invalid tuple size, must be 1 or 2: " + size );
+          }
         
         this.writer.write( key, value );
       }
