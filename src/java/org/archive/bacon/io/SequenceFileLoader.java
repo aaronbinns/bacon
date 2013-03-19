@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.ByteWritable;
 import org.apache.hadoop.io.DoubleWritable;
@@ -61,7 +59,6 @@ public class SequenceFileLoader extends FileInputLoadFunc {
   private Writable value;
   private ArrayList<Object> mProtoTuple = null;
   
-  protected static final Log LOG = LogFactory.getLog(SequenceFileLoader.class);
   protected TupleFactory mTupleFactory = TupleFactory.getInstance();
   protected SerializationFactory serializationFactory;
 
@@ -84,7 +81,6 @@ public class SequenceFileLoader extends FileInputLoadFunc {
   protected void setKeyType(Class<?> keyClass) throws BackendException {
     this.keyType |= inferPigDataType(keyClass);
     if (keyType == DataType.ERROR) { 
-      LOG.warn("Unable to translate key "+key.getClass()+" to a Pig datatype");
       throw new BackendException("Unable to translate "+key.getClass()+" to a Pig datatype");
     } 
   }
@@ -92,7 +88,6 @@ public class SequenceFileLoader extends FileInputLoadFunc {
   protected void setValueType(Class<?> valueClass) throws BackendException {
     this.valType |= inferPigDataType(valueClass);
     if (keyType == DataType.ERROR) { 
-      LOG.warn("Unable to translate key "+key.getClass()+" to a Pig datatype");
       throw new BackendException("Unable to translate "+key.getClass()+" to a Pig datatype");
     } 
   }
